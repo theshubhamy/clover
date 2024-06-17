@@ -15,4 +15,8 @@ module.exports = {
       },
     },
   },
+  corePlugin: {
+    backgroundOpacity: true,
+    opacity: true,
+  },
 };
