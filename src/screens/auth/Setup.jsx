@@ -17,7 +17,7 @@ const Setup = () => {
             onPress={() => {
               /* Handle Email & Password Login */
             }}
-            className="rounded-full px-4 py-2 bg-primary ">
+            className="rounded-full px-8 py-2 bg-primary ">
             <Text className="text-white font-semibold text-lg text-center">
               Continue with Email
             </Text>
@@ -26,7 +26,7 @@ const Setup = () => {
             onPress={() => {
               /* Handle Google Login */
             }}
-            className="rounded-full px-6 py-2  bg-primary  text-white">
+            className="rounded-full px-8 py-2  bg-primary">
             <Text className="text-white font-semibold text-lg text-center">
               Continue with Google
             </Text>
