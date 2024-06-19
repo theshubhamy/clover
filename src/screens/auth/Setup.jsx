@@ -26,8 +26,8 @@ const Setup = () => {
             onPress={() => {
               /* Handle Google Login */
             }}
-            className="rounded-full px-6 py-2  bg-primary opacity-20 text-primary">
-            <Text className="text-primary opacity-20  font-semibold text-lg text-center">
+            className="rounded-full px-6 py-2  bg-primary  text-white">
+            <Text className="text-white font-semibold text-lg text-center">
               Continue with Google
             </Text>
           </TouchableOpacity>
