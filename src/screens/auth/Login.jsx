@@ -1,12 +1,16 @@
-import {View, Text} from 'react-native';
-import React from 'react';
+// screens/LoginScreen.js
+import React, {useContext} from 'react';
+import {View, Button} from 'react-native';
+import {AuthContext} from '../../context/AuthContext';
 
-const Login = () => {
+const LoginScreen = () => {
+  const {signInWithGoogle} = useContext(AuthContext);
+
   return (
-    <View>
-      <Text>Login</Text>
+    <View className="flex justify-center items-center h-screen">
+      <Button title="Sign In with Google" onPress={signInWithGoogle} />
     </View>
   );
 };
 
-export default Login;
+export default LoginScreen;

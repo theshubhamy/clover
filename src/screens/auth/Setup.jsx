@@ -2,6 +2,7 @@ import {View, Text, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 
 const Setup = () => {
+  // Somewhere in your code
   return (
     <View className="flex-1 bg-white">
       <Image

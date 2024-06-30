@@ -1,13 +1,15 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
+import {AuthContext} from '../context/AuthContext';
+
 const RootNavigator = () => {
-  const {user} = useSelector(state => state.auth);
+  const {user} = useContext(AuthContext);
+
   return (
     <NavigationContainer>
-      {user !== null ? <AppStack /> : <AuthStack />}
+      {user ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

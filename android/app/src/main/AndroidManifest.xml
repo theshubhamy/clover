@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+<meta-data
+    android:name="com.google.android.gms.auth.api.signin.v2.apikey"
+    android:value="540627303350-bj5aq4d4644h6bnr6kj6mjpp6p9bn338.apps.googleusercontent.com" />
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
