@@ -13,6 +13,8 @@ export const AuthProvider = ({children}) => {
       offlineAccess: true,
       webClientId:
         '540627303350-bj5aq4d4644h6bnr6kj6mjpp6p9bn338.apps.googleusercontent.com',
+      iosClientId:
+        '540627303350-c19ogrcbc0qc1smeijlo3bheug11q3eo.apps.googleusercontent.com',
     });
 
     const unsubscribe = auth().onAuthStateChanged(authUser => {
@@ -24,6 +26,7 @@ export const AuthProvider = ({children}) => {
 
   const signInWithGoogle = async () => {
     try {
+      await GoogleSignin.hasPlayServices();
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
