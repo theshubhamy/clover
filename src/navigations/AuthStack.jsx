@@ -1,17 +1,17 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import Login from '../screens/auth/Login';
+import Register from '../screens/auth/Register';
 import Setup from '../screens/auth/Setup';
-const Stack = createStackNavigator();
+const {Navigator, Screen} = createStackNavigator();
 
 const AuthStack = () => {
   return (
-    <Stack.Navigator
-      initialRouteName="Login"
-      screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Setup" component={Setup} />
-      <Stack.Screen name="Login" component={Login} />
-    </Stack.Navigator>
+    <Navigator initialRouteName="Login" screenOptions={{headerShown: false}}>
+      <Screen name="Setup" component={Setup} />
+      <Screen name="Login" component={Login} />
+      <Screen name="Register" component={Register} />
+    </Navigator>
   );
 };
 

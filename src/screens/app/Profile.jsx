@@ -12,7 +12,7 @@ const Profile = () => {
       <Text className="text-xl font-bold text-primary mb-2">
         {user?.displayName}
       </Text>
-      <Text className="text-gray-600 mb-4">{user.email}</Text>
+      <Text className="text-gray-600 mb-4">{user?.email}</Text>
       <Button title="logout" onPress={() => signOut()} color="#1E40AF" />
     </View>
   );

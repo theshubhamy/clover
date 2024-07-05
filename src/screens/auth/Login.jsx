@@ -1,16 +1,79 @@
-// screens/LoginScreen.js
-import React, {useContext} from 'react';
-import {View, Button} from 'react-native';
+import React, {useState, useContext} from 'react';
+import {View, TextInput, Text, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../../context/AuthContext';
-
-const LoginScreen = () => {
-  const {signInWithGoogle} = useContext(AuthContext);
+import Icon from 'react-native-vector-icons/Ionicons';
+const Login = () => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const {signInWithGoogle, signIn} = useContext(AuthContext);
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+  const handleSignIn = () => {
+    signIn(emailOrPhone, password);
+  };
 
   return (
-    <View className="flex justify-center items-center h-screen">
-      <Button title="Sign In with Google" onPress={signInWithGoogle} />
+    <View className="flex-1 justify-center items-center p-5 bg-white">
+      <Text className="text-3xl font-bold text-center mb-3 text-gray-800">
+        Sign In
+      </Text>
+      <Text className="text-base text-center mb-6 text-gray-600">
+        Hi! Welcome Back, You've been missed
+      </Text>
+      <TextInput
+        className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white"
+        placeholder="Email or Phone"
+        value={emailOrPhone}
+        onChangeText={setEmailOrPhone}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <View className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white flex-row items-center">
+        <TextInput
+          className="flex-1"
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!isPasswordVisible}
+        />
+        <TouchableOpacity onPress={togglePasswordVisibility}>
+          <Icon
+            name={isPasswordVisible ? 'eye-off' : 'eye'}
+            size={20}
+            color="primary"
+          />
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity className="self-end mb-4">
+        <Text className="text-sm text-primary">Forgot Password?</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handleSignIn}
+        className="bg-primary  py-3 mb-4 w-full rounded-full">
+        <Text className="text-white text-center text-lg">Login</Text>
+      </TouchableOpacity>
+      <View className="flex-row items-center p-8 w-full">
+        <View className="flex-1 h-px bg-gray-300" />
+        <Text className="text-sm text-center text-gray-600 mx-4">
+          Or Sign in with
+        </Text>
+        <View className="flex-1 h-px bg-gray-300" />
+      </View>
+      <TouchableOpacity
+        onPress={signInWithGoogle}
+        className="bg-secondary rounded-full py-3 mb-6 w-full">
+        <Text className="text-primary text-center text-lg">
+          Sign In with Google
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity className="flex justify-center items-center flex-row gap-1">
+        <Text className="text-lg text-black">Don't have an account?</Text>
+        <Text className="text-lg font-semibold text-primary">Sign Up</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
-export default LoginScreen;
+export default Login;
