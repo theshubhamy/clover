@@ -1,6 +1,7 @@
-# Dating App using React Native
+````markdown
+# Clover Dating App using React Native
 
-Welcome to the Dating App project built with React Native! This app allows users to connect with potential matches based on their preferences and location.
+Welcome to the Clover Dating App project built with React Native! This app allows users to connect with potential matches based on their preferences and location.
 
 ## Project Setup and Run
 
@@ -10,7 +11,6 @@ Welcome to the Dating App project built with React Native! This app allows users
 git clone <repository-url>
 cd dating-app-react-native
 ```
-
 ````
 
 ### Step 2: Install dependencies
@@ -68,12 +68,13 @@ This app aims to provide a platform for users to discover and connect with poten
 
 Here are some snapshots of the app screens:
 
-- ![Screenshot 1](snapshot/Signin.png)
-- ![Screenshot 2](snapshot/Register.png)
-- ![Screenshot 3](snapshot/ForgotPassword.png)
-- ![Screenshot 3](snapshot/OtpVerification.png)
-- ![Screenshot 3](snapshot/Profile.png)
+- ![Signin](snapshot/Signin.png)
+- ![Register](snapshot/Register.png)
+- ![Forgot Password](snapshot/ForgotPassword.png)
+- ![OTP Verification](snapshot/OtpVerification.png)
+- ![Profile](snapshot/Profile.png)
 
+Replace `<repository-url>` with your actual repository URL and ensure your `snapshot` folder contains these image files.
 
 ## Troubleshooting
 
@@ -84,9 +85,3 @@ If you encounter issues running the app, refer to the [React Native troubleshoot
 For more details on React Native, visit the [React Native documentation](https://reactnative.dev/docs/getting-started).
 
 Happy coding! 🚀
-
-```
-
-This README.md file structure provides clear instructions on how to set up and run your React Native dating app project, outlines its features, showcases screen snapshots, and includes links for further learning and troubleshooting. Adjust `<repository-url>` with your actual repository URL and replace the example filenames under "Screen Snapshots" with your actual image filenames from the `snapshot` folder.
-```
-````
