@@ -1,4 +1,3 @@
-````markdown
 # Clover Dating App using React Native
 
 Welcome to the Clover Dating App project built with React Native! This app allows users to connect with potential matches based on their preferences and location.
@@ -11,6 +10,7 @@ Welcome to the Clover Dating App project built with React Native! This app allow
 git clone <repository-url>
 cd dating-app-react-native
 ```
+
 ````
 
 ### Step 2: Install dependencies
@@ -85,3 +85,4 @@ If you encounter issues running the app, refer to the [React Native troubleshoot
 For more details on React Native, visit the [React Native documentation](https://reactnative.dev/docs/getting-started).
 
 Happy coding! 🚀
+````
