@@ -66,7 +66,7 @@ const Register = ({navigation}) => {
       </View>
       <TouchableOpacity className="self-start mb-4">
         <Text className="text-xs text-primary px-4">
-          By signing up, you agree to the Terms & Conditions
+          By signing up, you agree to the Terms & Conditions.
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
