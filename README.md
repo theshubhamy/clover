@@ -74,7 +74,7 @@ This app aims to provide a platform for users to discover and connect with poten
 
 ## Screen Snapshots
 
-Here are some snapshots of the app screens, displayed in a grid format:
+Here are some snapshots of the app screens:
 
 <table>
   <tr>
