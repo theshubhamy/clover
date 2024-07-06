@@ -1,10 +1,10 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import {View, TextInput, Text, TouchableOpacity, Alert} from 'react-native';
-import {AuthContext} from '../../context/AuthContext';
+import {useAuth} from '../../context/AuthContext';
 
 const ForgotPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const {forgotPassword} = useContext(AuthContext);
+  const {forgotPassword} = useAuth();
 
   const handleRequestOtp = () => {
     forgotPassword(email)

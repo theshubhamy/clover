@@ -1,5 +1,11 @@
 // context/AuthContext.js
-import React, {createContext, useState, useEffect} from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useMemo,
+  useContext,
+} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
@@ -49,7 +55,9 @@ export const AuthProvider = ({children}) => {
         name,
         email,
         phone,
+        photoURL: currentUser?.photoURL,
         uid: currentUser.uid,
+        lastSignIn: firestore.FieldValue.serverTimestamp(),
       });
 
       showToast(
@@ -120,7 +128,19 @@ export const AuthProvider = ({children}) => {
       await GoogleSignin.hasPlayServices();
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      await auth().signInWithCredential(googleCredential);
+      const userCredential = await auth().signInWithCredential(
+        googleCredential,
+      );
+      const currentUser = userCredential.user;
+      await firestore().collection('users').doc(currentUser.uid).set({
+        displayName: currentUser.displayName,
+        email: currentUser.email,
+        phone: currentUser.phoneNumber,
+        photoURL: currentUser.photoURL,
+        uid: currentUser.uid,
+        lastSignIn: firestore.FieldValue.serverTimestamp(),
+      });
+
       showToast(
         'success',
         'Google Sign-In Successful',
@@ -145,19 +165,24 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const memoValue = useMemo(
+    () => ({
+      user,
+      register,
+      login,
+      forgotPassword,
+      signInWithGoogle,
+      signOut,
+      requestOtp,
+      verifyOtpAndSetPassword,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user],
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        register,
-        login,
-        forgotPassword,
-        signInWithGoogle,
-        signOut,
-        requestOtp,
-        verifyOtpAndSetPassword,
-      }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={memoValue}>{children}</AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);

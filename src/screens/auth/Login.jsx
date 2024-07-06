@@ -1,12 +1,12 @@
-import React, {useState, useContext} from 'react';
-import {View, TextInput, Text, TouchableOpacity} from 'react-native';
-import {AuthContext} from '../../context/AuthContext';
+import React, {useState} from 'react';
+import {View, TextInput, Text, TouchableOpacity, Image} from 'react-native';
+import {useAuth} from '../../context/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 const Login = ({navigation}) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
-  const {signInWithGoogle, login} = useContext(AuthContext);
+  const {signInWithGoogle, login} = useAuth();
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
@@ -42,7 +42,7 @@ const Login = ({navigation}) => {
           <Icon
             name={isPasswordVisible ? 'eye-off' : 'eye'}
             size={20}
-            color="primary"
+            color={isPasswordVisible ? '#A1B0CC' : '#FF3A8E'}
           />
         </TouchableOpacity>
       </View>
@@ -65,7 +65,11 @@ const Login = ({navigation}) => {
       </View>
       <TouchableOpacity
         onPress={signInWithGoogle}
-        className="bg-secondary rounded-full py-3 mb-6 w-full">
+        className="bg-secondary rounded-full py-3 mb-6 w-full gap-2 flex flex-row justify-center items-center">
+        <Image
+          source={require('../../assets/logo_google.png')}
+          className="w-10 h-10"
+        />
         <Text className="text-primary text-center text-lg">
           Sign In with Google
         </Text>

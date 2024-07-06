@@ -1,13 +1,13 @@
-import React, {useState, useContext} from 'react';
+import React, {useState} from 'react';
 import {View, TextInput, Text, TouchableOpacity, Alert} from 'react-native';
-import {AuthContext} from '../../context/AuthContext';
+import {useAuth} from '../../context/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 const OtpVerification = ({route, navigation}) => {
   const {email} = route.params;
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const {verifyOtpAndSetPassword} = useContext(AuthContext);
+  const {verifyOtpAndSetPassword} = useAuth();
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);

@@ -1,8 +1,8 @@
 import {View, Text, Image, Button} from 'react-native';
-import React, {useContext} from 'react';
-import {AuthContext} from '../../context/AuthContext';
+import React from 'react';
+import {useAuth} from '../../context/AuthContext';
 const Profile = () => {
-  const {user, signOut} = useContext(AuthContext);
+  const {user, signOut} = useAuth();
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <Image
