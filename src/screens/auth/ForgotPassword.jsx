@@ -4,10 +4,10 @@ import {AuthContext} from '../../context/AuthContext';
 
 const ForgotPassword = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const {requestOtp} = useContext(AuthContext);
+  const {forgotPassword} = useContext(AuthContext);
 
   const handleRequestOtp = () => {
-    requestOtp(email)
+    forgotPassword(email)
       .then(() => {
         navigation.navigate('OtpVerification', {email});
       })
