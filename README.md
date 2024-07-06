@@ -21,8 +21,6 @@ git clone https://github.com/theshubhamy/clover.git
 cd clover
 ```
 
-````
-
 ### Step 2: Install dependencies
 
 ```bash
@@ -95,4 +93,4 @@ If you encounter issues running the app, refer to the [React Native troubleshoot
 For more details on React Native, visit the [React Native documentation](https://reactnative.dev/docs/getting-started).
 
 Happy coding! 🚀
-````
+
