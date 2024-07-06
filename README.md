@@ -74,15 +74,20 @@ This app aims to provide a platform for users to discover and connect with poten
 
 ## Screen Snapshots
 
-Here are some snapshots of the app screens:
+Here are some snapshots of the app screens, displayed in a grid format:
 
-- ![Signin](snapshot/Signin.png)
-- ![Register](snapshot/Register.png)
-- ![Forgot Password](snapshot/ForgotPassword.png)
-- ![OTP Verification](snapshot/OtpVerification.png)
-- ![Profile](snapshot/Profile.png)
-
-Replace `<repository-url>` with your actual repository URL and ensure your `snapshot` folder contains these image files.
+<table>
+  <tr>
+	<td><img src="snapshot/Signin.png" alt="Signin" width="200"/></td>
+	<td><img src="snapshot/Register.png" alt="Register" width="200"/></td>
+	<td><img src="snapshot/ForgotPassword.png" alt="Forgot Password" width="200"/></td>
+  </tr>
+  <tr>
+	<td><img src="snapshot/OtpVerification.png" alt="OTP Verification" width="200"/></td>
+	<td><img src="snapshot/Profile.png" alt="Profile" width="200"/></td>
+	<td></td> <!-- Empty cell for alignment -->
+  </tr>
+</table>
 
 ## Troubleshooting
 
@@ -93,4 +98,3 @@ If you encounter issues running the app, refer to the [React Native troubleshoot
 For more details on React Native, visit the [React Native documentation](https://reactnative.dev/docs/getting-started).
 
 Happy coding! 🚀
-
