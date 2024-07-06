@@ -1,55 +1,53 @@
-// screens/ChatScreen.js
-import React, {useContext, useState, useEffect} from 'react';
-import {View, TextInput, Button, FlatList, Text} from 'react-native';
-import firestore from '@react-native-firebase/firestore';
-import {AuthContext} from '../context/AuthContext';
-import {tailwind} from 'react-native-tailwindcss';
-
-const ChatScreen = ({route}) => {
-  const {user} = useContext(AuthContext);
-  const [messages, setMessages] = useState([]);
-  const [text, setText] = useState('');
+import React, {useState, useEffect} from 'react';
+import {firestore} from '../../services/firebase';
+import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+const ChatScreen = ({navigation}) => {
+  const [chatRooms, setChatRooms] = useState([]);
 
   useEffect(() => {
     const unsubscribe = firestore()
-      .collection('messages')
-      .where('chatId', '==', route.params.chatId)
-      .orderBy('createdAt', 'desc')
+      .collection('chatRooms')
       .onSnapshot(snapshot => {
-        const messagesData = snapshot.docs.map(doc => ({
+        const rooms = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
         }));
-        setMessages(messagesData);
+        setChatRooms(rooms);
       });
-    return unsubscribe;
-  }, [route.params.chatId]);
 
-  const sendMessage = () => {
-    firestore().collection('messages').add({
-      text,
-      createdAt: firestore.FieldValue.serverTimestamp(),
-      userId: user.uid,
-      chatId: route.params.chatId,
-    });
-    setText('');
+    return () => unsubscribe();
+  }, []);
+  const openChatRoom = chatRoomId => {
+    navigation.navigate('ChatRoom', {chatRoomId});
+  };
+
+  const createNewChat = () => {
+    // Implement logic to create new chat
+    // Example: createNewChatWithMatches();
+    // Then navigate to the new chat room
+    navigation.navigate('NewChat');
   };
 
   return (
-    <View style={tailwind('flex-1 p-4')}>
+    <View className="flex-1">
+      <Text className="text-2xl font-bold p-4">Chats</Text>
       <FlatList
-        data={messages}
+        data={chatRooms}
         keyExtractor={item => item.id}
         renderItem={({item}) => (
-          <Text style={tailwind('p-2')}>{item.text}</Text>
+          <TouchableOpacity
+            className="p-4 border border-primary"
+            onPress={() => openChatRoom(item.id)}>
+            <Text className="text-lg text-primary">{item.name}</Text>
+            <Text className="text-lg text-primary">{item.phone}</Text>
+          </TouchableOpacity>
         )}
       />
-      <TextInput
-        style={tailwind('border p-2 mb-2')}
-        value={text}
-        onChangeText={setText}
-      />
-      <Button title="Send" onPress={sendMessage} />
+      <TouchableOpacity
+        className="p-4 bg-blue-500 rounded-full mt-4 mx-4"
+        onPress={createNewChat}>
+        <Text className="text-white font-bold">New Chat with Matches</Text>
+      </TouchableOpacity>
     </View>
   );
 };

@@ -111,7 +111,6 @@ export const AuthProvider = ({children}) => {
         'Password reset email sent successfully.',
       );
     } catch (error) {
-      console.error('Forgot Password Error:', error);
       showToast('error', 'Forgot Password Error', error.message);
     }
   };
@@ -128,7 +127,6 @@ export const AuthProvider = ({children}) => {
         'You have been signed in with Google.',
       );
     } catch (error) {
-      console.error('Google Sign-In Error:', error);
       showToast('error', 'Google Sign-In Error', error.message);
     }
   };
