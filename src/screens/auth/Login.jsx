@@ -2,7 +2,7 @@ import React, {useState, useContext} from 'react';
 import {View, TextInput, Text, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../../context/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
-const Login = () => {
+const Login = ({navigation}) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +46,9 @@ const Login = () => {
           />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity className="self-end mb-4">
+      <TouchableOpacity
+        className="self-end mb-4"
+        onPress={() => navigation.navigate('ForgotPassword')}>
         <Text className="text-sm text-primary">Forgot Password?</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -68,7 +70,9 @@ const Login = () => {
           Sign In with Google
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity className="flex justify-center items-center flex-row gap-1">
+      <TouchableOpacity
+        className="flex justify-center items-center flex-row gap-1"
+        onPress={() => navigation.navigate('Register')}>
         <Text className="text-lg text-black">Don't have an account?</Text>
         <Text className="text-lg font-semibold text-primary">Sign Up</Text>
       </TouchableOpacity>

@@ -1,60 +1,100 @@
 import React, {useState, useContext} from 'react';
 import {View, TextInput, Text, TouchableOpacity} from 'react-native';
 import {AuthContext} from '../../context/AuthContext';
-
-const Register = () => {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
+import Icon from 'react-native-vector-icons/Ionicons';
+const Register = ({navigation}) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const {signInWithGoogle, signIn} = useContext(AuthContext);
-
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
   const handleSignIn = () => {
-    signIn(emailOrPhone, password);
+    signIn(email, phone, password);
   };
 
   return (
-    <View className="flex justify-center items-center h-screen p-5">
-      <Text className="text-2xl font-bold text-center mb-5">
+    <View className="flex-1 justify-center items-center p-5 bg-white">
+      <Text className="text-3xl font-bold text-center mb-3 text-gray-800">
         Create Account
       </Text>
-      <Text className="text-sm font-normal text-center mb-5">
+      <Text className="text-base text-center mb-6 text-gray-600">
         Fill your information below or register with your social account.
       </Text>
       <TextInput
-        className="h-10 border border-gray-300 rounded mb-3 px-3 w-full"
-        placeholder="Email or Phone"
-        value={emailOrPhone}
-        onChangeText={setEmailOrPhone}
+        className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white"
+        placeholder="Name "
+        value={name}
+        onChangeText={setName}
+        keyboardType="default"
+        autoCapitalize="none"
+      />
+      <TextInput
+        className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white"
+        placeholder="Email "
+        value={email}
+        onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
       <TextInput
-        className="h-10 border border-gray-300 rounded mb-3 px-3 w-full"
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+        className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white"
+        placeholder="Phone"
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="number-pad"
+        autoCapitalize="none"
       />
-      <Text className="text-sm font-normal text-left my-2">
-        Agree with Terms & Conditions
-      </Text>
+      <View className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white flex-row items-center">
+        <TextInput
+          className="flex-1"
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!isPasswordVisible}
+        />
+        <TouchableOpacity onPress={togglePasswordVisibility}>
+          <Icon
+            name={isPasswordVisible ? 'eye-off' : 'eye'}
+            size={20}
+            color="primary"
+          />
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity className="self-start mb-4">
+        <Text className="text-xs text-primary">
+          By signing up, you agree to the Terms & Conditions
+        </Text>
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={handleSignIn}
-        className="bg-blue-500 rounded p-2 mb-3 w-full">
-        <Text className="text-white text-center">Login</Text>
+        className="bg-primary  py-3 mb-4 w-full rounded-full">
+        <Text className="text-white text-center text-lg">Login</Text>
       </TouchableOpacity>
-      <Text className="text-sm font-normal text-right my-2">
-        Or continue with
-      </Text>
+      <View className="flex-row items-center p-8 w-full">
+        <View className="flex-1 h-px bg-gray-300" />
+        <Text className="text-sm text-center text-gray-600 mx-4">
+          Or continue with
+        </Text>
+        <View className="flex-1 h-px bg-gray-300" />
+      </View>
       <TouchableOpacity
         onPress={signInWithGoogle}
-        className="bg-red-500 rounded p-2 w-full">
-        <Text className="text-white text-center">Sign In with Google</Text>
+        className="bg-secondary rounded-full py-3 mb-6 w-full">
+        <Text className="text-primary text-center text-lg">
+          Sign In with Google
+        </Text>
       </TouchableOpacity>
-      <Text className="text-sm font-normal text-right my-2">
-        Already have an Account? Sign In
-      </Text>
+      <TouchableOpacity
+        className="flex justify-center items-center flex-row gap-1"
+        onPress={() => navigation.navigate('Login')}>
+        <Text className="text-lg text-black">Already have an Account? </Text>
+        <Text className="text-lg font-semibold text-primary">Sign In</Text>
+      </TouchableOpacity>
     </View>
   );
 };
-
 export default Register;
