@@ -9,7 +9,6 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
-
   useEffect(() => {
     GoogleSignin.configure({
       offlineAccess: true,
@@ -52,14 +51,13 @@ export const AuthProvider = ({children}) => {
         phone,
         uid: currentUser.uid,
       });
-      setUser(currentUser);
+
       showToast(
         'success',
         'Registration Successful',
         'You have been registered successfully.',
       );
     } catch (error) {
-      console.error('Registration Error:', error);
       showToast('error', 'Registration Error', error.message);
     }
   };
@@ -78,7 +76,11 @@ export const AuthProvider = ({children}) => {
         if (!userSnapshot.empty) {
           email = userSnapshot.docs[0].data().email;
         } else {
-          throw new Error('No user found with this phone number.');
+          showToast(
+            'error',
+            'Login Error:',
+            'No user found with this phone number.',
+          );
         }
       }
       await auth().signInWithEmailAndPassword(email, password);
@@ -88,7 +90,6 @@ export const AuthProvider = ({children}) => {
         'You have been logged in successfully.',
       );
     } catch (error) {
-      console.error('Login Error:', error);
       showToast('error', 'Login Error', error.message);
     }
   };
@@ -142,7 +143,6 @@ export const AuthProvider = ({children}) => {
         'You have been signed out successfully.',
       );
     } catch (error) {
-      console.error('Sign Out Error:', error);
       showToast('error', 'Sign Out Error', error.message);
     }
   };
@@ -160,7 +160,6 @@ export const AuthProvider = ({children}) => {
         verifyOtpAndSetPassword,
       }}>
       {children}
-      <Toast ref={ref => Toast.setRef(ref)} />
     </AuthContext.Provider>
   );
 };

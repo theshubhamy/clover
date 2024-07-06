@@ -8,12 +8,12 @@ const Register = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const {signInWithGoogle, signIn} = useContext(AuthContext);
+  const {signInWithGoogle, register} = useContext(AuthContext);
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
-  const handleSignIn = () => {
-    signIn(email, phone, password);
+  const handleSignUp = () => {
+    register(name, email, phone, password);
   };
 
   return (
@@ -70,9 +70,9 @@ const Register = ({navigation}) => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={handleSignIn}
+        onPress={handleSignUp}
         className="bg-primary  py-3 mb-4 w-full rounded-full">
-        <Text className="text-white text-center text-lg">Login</Text>
+        <Text className="text-white text-center text-lg">Sign Up</Text>
       </TouchableOpacity>
       <View className="flex-row items-center p-8 w-full">
         <View className="flex-1 h-px bg-gray-300" />

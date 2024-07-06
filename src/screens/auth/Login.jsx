@@ -6,12 +6,12 @@ const Login = ({navigation}) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
-  const {signInWithGoogle, signIn} = useContext(AuthContext);
+  const {signInWithGoogle, login} = useContext(AuthContext);
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
   const handleSignIn = () => {
-    signIn(emailOrPhone, password);
+    login(emailOrPhone, password);
   };
 
   return (
