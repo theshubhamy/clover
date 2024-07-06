@@ -3,6 +3,7 @@ import React, {createContext, useState, useEffect} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import Toast from 'react-native-toast-message';
 
 export const AuthContext = createContext();
 
@@ -25,6 +26,18 @@ export const AuthProvider = ({children}) => {
     return unsubscribe;
   }, []);
 
+  const showToast = (type, text1, text2) => {
+    Toast.show({
+      type,
+      text1,
+      text2,
+      position: 'top',
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 50,
+    });
+  };
+
   const register = async (name, email, phone, password) => {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
@@ -40,8 +53,14 @@ export const AuthProvider = ({children}) => {
         uid: currentUser.uid,
       });
       setUser(currentUser);
+      showToast(
+        'success',
+        'Registration Successful',
+        'You have been registered successfully.',
+      );
     } catch (error) {
       console.error('Registration Error:', error);
+      showToast('error', 'Registration Error', error.message);
     }
   };
 
@@ -63,8 +82,14 @@ export const AuthProvider = ({children}) => {
         }
       }
       await auth().signInWithEmailAndPassword(email, password);
+      showToast(
+        'success',
+        'Login Successful',
+        'You have been logged in successfully.',
+      );
     } catch (error) {
       console.error('Login Error:', error);
+      showToast('error', 'Login Error', error.message);
     }
   };
 
@@ -79,8 +104,14 @@ export const AuthProvider = ({children}) => {
   const forgotPassword = async email => {
     try {
       await auth().sendPasswordResetEmail(email);
+      showToast(
+        'success',
+        'Password Reset',
+        'Password reset email sent successfully.',
+      );
     } catch (error) {
       console.error('Forgot Password Error:', error);
+      showToast('error', 'Forgot Password Error', error.message);
     }
   };
 
@@ -90,8 +121,14 @@ export const AuthProvider = ({children}) => {
       const {idToken} = await GoogleSignin.signIn();
       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       await auth().signInWithCredential(googleCredential);
+      showToast(
+        'success',
+        'Google Sign-In Successful',
+        'You have been signed in with Google.',
+      );
     } catch (error) {
       console.error('Google Sign-In Error:', error);
+      showToast('error', 'Google Sign-In Error', error.message);
     }
   };
 
@@ -99,8 +136,14 @@ export const AuthProvider = ({children}) => {
     try {
       await auth().signOut();
       await GoogleSignin.signOut();
+      showToast(
+        'success',
+        'Sign Out Successful',
+        'You have been signed out successfully.',
+      );
     } catch (error) {
       console.error('Sign Out Error:', error);
+      showToast('error', 'Sign Out Error', error.message);
     }
   };
 
@@ -117,6 +160,7 @@ export const AuthProvider = ({children}) => {
         verifyOtpAndSetPassword,
       }}>
       {children}
+      <Toast ref={ref => Toast.setRef(ref)} />
     </AuthContext.Provider>
   );
 };
