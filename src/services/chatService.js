@@ -9,11 +9,6 @@ const listenForMessages = (chatRoomId, onSnapshot) => {
     .onSnapshot(onSnapshot);
 };
 
-export const fetchUsers = async () => {
-  const snapshot = await firestore().collection('users').get();
-  return snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-};
-
 export const fetchMatches = async () => {
   const userId = 'currentUserId'; // Replace with current user's ID or fetch dynamically
   const snapshot = await firestore()

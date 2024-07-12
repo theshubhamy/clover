@@ -60,7 +60,7 @@ const Register = ({navigation}) => {
           <Icon
             name={isPasswordVisible ? 'eye-off' : 'eye'}
             size={20}
-            color="primary"
+            color={isPasswordVisible ? '#A1B0CC' : '#FF3A8E'}
           />
         </TouchableOpacity>
       </View>
@@ -86,7 +86,7 @@ const Register = ({navigation}) => {
         className="bg-secondary rounded-full py-3 mb-6 w-full gap-2 flex flex-row justify-center items-center">
         <Image
           source={require('../../assets/logo_google.png')}
-          className="w-10 h-10"
+          className="w-9 h-9"
         />
         <Text className="text-primary text-center text-lg">
           Sign In with Google

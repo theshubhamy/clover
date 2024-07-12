@@ -68,7 +68,7 @@ const Login = ({navigation}) => {
         className="bg-secondary rounded-full py-3 mb-6 w-full gap-2 flex flex-row justify-center items-center">
         <Image
           source={require('../../assets/logo_google.png')}
-          className="w-10 h-10"
+          className="w-9 h-9"
         />
         <Text className="text-primary text-center text-lg">
           Sign In with Google

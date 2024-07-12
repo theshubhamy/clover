@@ -1,5 +1,11 @@
-import {firestoredb} from './firebase';
+import {firestoredb, firestore} from './firebase';
 
+export const fetchUsers = async currentUserId => {
+  const snapshot = await firestore().collection('users').get();
+  return snapshot.docs
+    .filter(doc => doc.id !== currentUserId)
+    .map(doc => ({id: doc.id, ...doc.data()}));
+};
 const getUserProfile = async userId => {
   try {
     const doc = await firestoredb.collection('users').doc(userId).get();
