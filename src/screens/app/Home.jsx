@@ -12,6 +12,7 @@ const Home = ({navigation}) => {
     queryKey: ['users', user?.uid],
     queryFn: () => fetchUsers(user?.uid),
   });
+  console.log(error);
   const navigateToPreferences = () => {
     navigation.navigate('Preference');
   };
@@ -23,39 +24,31 @@ const Home = ({navigation}) => {
     );
   }
 
-  if (error) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <Text>Error fetching users</Text>
-      </View>
-    );
-  }
   return (
-    <View className="flex-1 bg-white">
-      {/* header */}
-      <View className="flex-row justify-between items-center p-4">
-        <View className="flex flex-row justify-center items-center gap-4">
-          <Image
-            source={{
-              uri: 'https://firebasestorage.googleapis.com/v0/b/clover-rn.appspot.com/o/user.png?alt=media&token=f504d6de-ef4d-4759-b91c-da060e6c1f04',
-            }}
-            className="w-12 h-12 rounded-full border border-primary "
-          />
-          <Text className="text-base font-semibold leading-7 tracking-tight text-gray-900">
-            {user.displayName}
-          </Text>
+    <>
+      <View className="flex-1 bg-white">
+        {/* header */}
+        <View className="flex-row justify-between items-center px-4 py-2">
+          <View className="flex flex-row justify-center items-center gap-4">
+            <Image
+              source={{
+                uri: 'https://firebasestorage.googleapis.com/v0/b/clover-rn.appspot.com/o/user.png?alt=media&token=f504d6de-ef4d-4759-b91c-da060e6c1f04',
+              }}
+              className="w-12 h-12 rounded-full border border-primary "
+            />
+            <Text className="text-base font-semibold leading-7 tracking-tight text-gray-900">
+              {user.displayName}
+            </Text>
+          </View>
+
+          <TouchableOpacity onPress={navigateToPreferences} className="p-2">
+            <Icon name="filter" size={24} color={'#ff3a8e'} />
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity onPress={navigateToPreferences} className="p-2">
-          <Icon name="filter" size={24} className="text-primary" />
-        </TouchableOpacity>
-      </View>
-
-      <View className="flex-1">
-        <Text className="text-2xl px-2">Welcome {user?.displayName}!</Text>
+        {/* SwiperCard */}
         <SwiperCard data={data} />
       </View>
-    </View>
+    </>
   );
 };
 
