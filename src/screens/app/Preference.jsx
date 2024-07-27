@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Switch, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import RangeSlider from '../../components/Preference';
+import RangeSlider from '../../components/RangeSlider';
 import CheckBoxGroup from '../../components/CheckBoxGroup';
 
 const Preference = ({navigation}) => {
