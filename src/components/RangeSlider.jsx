@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, StyleSheet, Animated, PanResponder, Text} from 'react-native';
 
-const RangeSlider = ({min, max, step, onValueChange, label}) => {
+const RangeSlider = ({min, max, onValueChange, label}) => {
   const [sliderWidth, setSliderWidth] = useState(0);
   const [minValue, setMinValue] = useState(min);
   const [maxValue, setMaxValue] = useState(max);
