@@ -1,7 +1,6 @@
 import {View, Text, Image, TouchableOpacity, FlatList} from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {MIcon} from '../../components/Icons';
 import {useAuth} from '../../context/AuthContext';
 const Profile = () => {
   const {user, signOut} = useAuth();
