@@ -17,8 +17,11 @@ const RangeSlider = ({min, max, step, onValueChange, label}) => {
   const panResponderMin = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
-      let newValue = (gestureState.dx / sliderWidth) * (max - min) + minValue;
-      newValue = Math.round(newValue / step) * step;
+      const newValue = Math.round(
+        ((gestureState.dx + minThumbX.__getValue()) / sliderWidth) *
+          (max - min) +
+          min,
+      );
       if (newValue >= min && newValue <= maxValue) {
         setMinValue(newValue);
         onValueChange([newValue, maxValue]);
@@ -33,8 +36,11 @@ const RangeSlider = ({min, max, step, onValueChange, label}) => {
   const panResponderMax = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
-      let newValue = (gestureState.dx / sliderWidth) * (max - min) + maxValue;
-      newValue = Math.round(newValue / step) * step;
+      const newValue = Math.round(
+        ((gestureState.dx + maxThumbX.__getValue()) / sliderWidth) *
+          (max - min) +
+          min,
+      );
       if (newValue <= max && newValue >= minValue) {
         setMaxValue(newValue);
         onValueChange([minValue, newValue]);
@@ -58,11 +64,29 @@ const RangeSlider = ({min, max, step, onValueChange, label}) => {
         style={styles.track}
         onLayout={event => setSliderWidth(event.nativeEvent.layout.width)}>
         <Animated.View
-          style={[styles.thumb, {left: minThumbX}]}
+          style={[
+            styles.thumb,
+            {
+              left: minThumbX.interpolate({
+                inputRange: [0, sliderWidth],
+                outputRange: [0, sliderWidth - 25], // Thumb width subtracted
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
           {...panResponderMin.panHandlers}
         />
         <Animated.View
-          style={[styles.thumb, {left: maxThumbX}]}
+          style={[
+            styles.thumb,
+            {
+              left: maxThumbX.interpolate({
+                inputRange: [0, sliderWidth],
+                outputRange: [0, sliderWidth - 25], // Thumb width subtracted
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
           {...panResponderMax.panHandlers}
         />
       </View>
