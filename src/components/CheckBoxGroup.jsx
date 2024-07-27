@@ -17,7 +17,13 @@ const CheckBoxGroup = ({items, onChange, multiple}) => {
   };
 
   const renderItem = ({item, index}) => (
-    <TouchableOpacity style={styles.card} onPress={() => toggleCheckbox(index)}>
+    <TouchableOpacity
+      style={[
+        styles.card,
+        // eslint-disable-next-line react-native/no-inline-styles
+        {backgroundColor: item.isChecked ? '#FF3A8E' : '#f0f0f0'},
+      ]}
+      onPress={() => toggleCheckbox(index)}>
       <Text style={styles.label}>{item.label}</Text>
       <CheckBox
         value={item.isChecked}
@@ -27,8 +33,8 @@ const CheckBoxGroup = ({items, onChange, multiple}) => {
         tintColors={{true: '#FF3A8E', false: '#2C272C'}} // For iOS
         tintColor={item.isChecked ? '#FF3A8E' : '#2C272C'} // For Android
         onCheckColor={item.isChecked ? '#FF3A8E' : '#2C272C'}
-        onTintColor={item.isChecked ? '#FF3A8E' : '#2C272C'}
-        onFillColor={item.isChecked ? '#FFE0ED' : '#2C272C'}
+        onTintColor={item.isChecked ? '#FF3A8E' : '#FFFDFF'}
+        onFillColor={item.isChecked ? '#ffffff' : '#FFFDFF'}
       />
     </TouchableOpacity>
   );
@@ -54,7 +60,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     marginVertical: 8,
-    backgroundColor: '#fff0f0',
     borderRadius: 8,
     elevation: 2,
     width: '100%',

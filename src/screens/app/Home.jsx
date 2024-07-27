@@ -37,12 +37,14 @@ const Home = ({navigation}) => {
                 className="w-12 h-12 rounded-full border border-primary "
               />
             </TouchableOpacity>
-            <Text className="text-base font-semibold leading-7 tracking-tight text-gray-900">
+            <Text className="text-xl font-semibold leading-7 tracking-tight text-primary">
               {user.displayName}
             </Text>
           </View>
 
-          <TouchableOpacity onPress={navigateToPreferences} className="p-2">
+          <TouchableOpacity
+            onPress={navigateToPreferences}
+            className="p-2 border-secondary border rounded-full">
             <Icon name="filter" size={24} color={'#ff3a8e'} />
           </TouchableOpacity>
         </View>

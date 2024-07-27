@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text} from 'react-native';
 import RangeSlider from '../../components/RangeSlider';
 import CheckBoxGroup from '../../components/CheckBoxGroup';
 const Preference = () => {
   const [range, setRange] = useState([0, 100]);
-  // const items = [{label: 'Men'}, {label: 'Women'}];
   const handleValueChange = newValue => {
     setRange(newValue);
     // Handle additional logic if needed
