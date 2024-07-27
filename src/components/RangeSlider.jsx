@@ -69,7 +69,7 @@ const RangeSlider = ({min, max, step, onValueChange, label}) => {
             {
               left: minThumbX.interpolate({
                 inputRange: [0, sliderWidth],
-                outputRange: [0, sliderWidth - 25], // Thumb width subtracted
+                outputRange: [0, sliderWidth - 20], // Thumb width subtracted
                 extrapolate: 'clamp',
               }),
             },
@@ -82,7 +82,7 @@ const RangeSlider = ({min, max, step, onValueChange, label}) => {
             {
               left: maxThumbX.interpolate({
                 inputRange: [0, sliderWidth],
-                outputRange: [0, sliderWidth - 25], // Thumb width subtracted
+                outputRange: [0, sliderWidth - 20], // Thumb width subtracted
                 extrapolate: 'clamp',
               }),
             },
@@ -108,23 +108,23 @@ const styles = StyleSheet.create({
   },
   thumb: {
     position: 'absolute',
-    width: 25,
-    height: 25,
+    width: 20,
+    height: 20,
     borderRadius: 100,
     backgroundColor: '#FF3A8E',
-    top: -10,
+    top: -8,
   },
   valuesContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: 12,
     gap: 4,
   },
   valueText: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: 'semibold',
   },
 });
 
