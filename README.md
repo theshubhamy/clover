@@ -85,7 +85,7 @@ Here are some snapshots of the app screens:
   <tr>
 	<td><img src="snapshot/OtpVerification.png" alt="OTP Verification" width="200"/></td>
 	<td><img src="snapshot/Profile.png" alt="Profile" width="200"/></td>
-	<td></td> <!-- Empty cell for alignment -->
+	<td><img src="snapshot/Preference.png" alt="Profile" width="200"/></td> <!-- Empty cell for alignment -->
   </tr>
 </table>
 
