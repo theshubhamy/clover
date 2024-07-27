@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Switch, Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import RangeSlider from '../../components/RangeSlider';
+import RangeSlider from '../../components/Preference';
 import CheckBoxGroup from '../../components/CheckBoxGroup';
 
 const Preference = ({navigation}) => {
@@ -26,7 +26,6 @@ const Preference = ({navigation}) => {
 
   const handleCheckboxChange = updatedItems => {
     setSelectedItems(updatedItems);
-    console.log(updatedItems);
   };
 
   const handleReset = () => {
@@ -82,6 +81,8 @@ const Preference = ({navigation}) => {
           min={18}
           max={60}
           label={'years old'}
+          minValue={ageRange[0]}
+          maxValue={ageRange[1]}
           onValueChange={newValue => handleValueChange(newValue, 'age')}
         />
       </View>
@@ -90,6 +91,8 @@ const Preference = ({navigation}) => {
         <RangeSlider
           min={100}
           max={250}
+          minValue={heightRange[0]}
+          maxValue={heightRange[1]}
           label={'cm'}
           onValueChange={newValue => handleValueChange(newValue, 'height')}
         />

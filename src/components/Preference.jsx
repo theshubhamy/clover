@@ -1,18 +1,33 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, StyleSheet, Animated, PanResponder, Text} from 'react-native';
 
-const RangeSlider = ({min, max, onValueChange, label}) => {
+const RangeSlider = ({
+  min,
+  max,
+  onValueChange,
+  label,
+  minValue: propMinValue,
+  maxValue: propMaxValue,
+}) => {
   const [sliderWidth, setSliderWidth] = useState(0);
-  const [minValue, setMinValue] = useState(min);
-  const [maxValue, setMaxValue] = useState(max);
+  const [minValue, setMinValue] = useState(propMinValue);
+  const [maxValue, setMaxValue] = useState(propMaxValue);
   const minThumbX = useRef(new Animated.Value(0)).current;
   const maxThumbX = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    setMinValue(propMinValue);
+    setMaxValue(propMaxValue);
+    minThumbX.setValue(((propMinValue - min) / (max - min)) * sliderWidth);
+    maxThumbX.setValue(((propMaxValue - min) / (max - min)) * sliderWidth);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propMinValue, propMaxValue, sliderWidth]);
 
   useEffect(() => {
     minThumbX.setValue(((minValue - min) / (max - min)) * sliderWidth);
     maxThumbX.setValue(((maxValue - min) / (max - min)) * sliderWidth);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [max, min, minValue, maxValue, sliderWidth]);
+  }, [minValue, maxValue, sliderWidth]);
 
   const panResponderMin = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
