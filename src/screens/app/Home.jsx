@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useQuery} from '@tanstack/react-query';
 import SwiperCard from '../../components/SwiperCard';
@@ -7,20 +7,18 @@ import {useAuth} from '../../context/AuthContext';
 import {fetchUsers} from '../../services/userService';
 const Home = ({navigation}) => {
   const {user} = useAuth();
-  const {data, isLoading} = useQuery({
+  const {data, isLoading, refetch} = useQuery({
     queryKey: ['users', user?.uid],
     queryFn: () => fetchUsers(user?.uid),
+    enabled: !!user?.uid,
   });
+  console.log(data);
   const navigateToPreferences = () => {
     navigation.navigate('Preference');
   };
-  if (isLoading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  const handleRefresh = () => {
+    refetch();
+  };
 
   return (
     <>
@@ -48,54 +46,16 @@ const Home = ({navigation}) => {
           </TouchableOpacity>
         </View>
         {/* SwiperCard */}
-        {data.length !== 0 ? (
-          <SwiperCard data={data} />
-        ) : (
-          <View className="flex-1 p-4 bg-white  ">
-            <View className="flex-1 justify-center items-center gap-4">
-              <Icon name="sad" size={80} color={'#2C272C'} />
-              <Text className="text-3xl font-bold text-paper">
-                No new profiles
-              </Text>
-              <Text className="text-lg text-center px-4 text-paper  ">
-                Change your preferences to expand your search and see New
-                Profiles
-              </Text>
-            </View>
 
-            <View className="flex-1 justify-end my-4 bg-white">
-              <View className="flex-column justify-between items-center gap-8">
-                <TouchableOpacity
-                  className="px-4 py-3 bg-primary rounded-full w-full"
-                  style={styles.cardShadow}
-                  onPress={navigateToPreferences}>
-                  <Text className="text-white text-center text-lg font-medium">
-                    Change my preferences
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="px-4 py-3  bg-secondary  rounded-full w-full"
-                  style={styles.cardShadow}>
-                  <Text className="text-primary text-center text-lg font-medium">
-                    Refresh
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        )}
+        <SwiperCard
+          data={data}
+          navigateToPreferences={navigateToPreferences}
+          handleRefresh={handleRefresh}
+          isLoading={isLoading}
+        />
       </View>
     </>
   );
 };
-const styles = StyleSheet.create({
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-});
 
 export default Home;

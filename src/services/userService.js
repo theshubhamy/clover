@@ -63,8 +63,6 @@ const userSwipeProfiles = async (type, userId, userswiped) => {
       .collection(type)
       .doc(userswiped?.id)
       .set(userswiped);
-
-    console.log(`you swiped pass on ${userswiped.name}`);
   } catch (error) {
     console.error('Error fetching user profile:', error);
     throw error;
