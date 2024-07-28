@@ -1,4 +1,11 @@
-import {View, Text, Image, TouchableOpacity, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../../context/AuthContext';
@@ -12,7 +19,9 @@ const Profile = () => {
     {label: 'Support', icon: 'headset'},
   ];
   const renderItem = ({item}) => (
-    <TouchableOpacity className=" flex flex-row justify-between items-center p-4 my-2 rounded-full  bg-secondary ">
+    <TouchableOpacity
+      className=" flex flex-row justify-between items-center p-4 my-2 rounded-full  bg-white "
+      style={styles.cardShadow}>
       <View className="flex flex-row gap-4 items-center">
         <Icon name={item.icon} size={24} color={'#FF3A8E'} />
         <Text>{item.label}</Text>
@@ -22,7 +31,7 @@ const Profile = () => {
     </TouchableOpacity>
   );
   return (
-    <View className="flex-1 items-center justify-center bg-white p-8">
+    <View className="flex-1 items-center justify-center bg-gray p-8">
       <Image
         source={{
           uri: 'https://firebasestorage.googleapis.com/v0/b/clover-rn.appspot.com/o/user.png?alt=media&token=f504d6de-ef4d-4759-b91c-da060e6c1f04',
@@ -43,7 +52,8 @@ const Profile = () => {
       <View className="flex-1 justify-end w-full ">
         <TouchableOpacity
           onPress={() => signOut()}
-          className="flex flex-row justify-center items-center px-4 py-3 bg-primary rounded-full w-full gap-4">
+          className="flex flex-row justify-center items-center px-4 py-3 bg-primary rounded-full w-full gap-4"
+          style={styles.cardShadow}>
           <Icon name="log-out-outline" size={24} color={'#ffff'} />
           <Text className="text-white text-center text-lg font-medium">
             Log out
@@ -53,5 +63,13 @@ const Profile = () => {
     </View>
   );
 };
-
+const styles = StyleSheet.create({
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+});
 export default Profile;

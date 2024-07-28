@@ -12,7 +12,7 @@ module.exports = {
         whitegray: '#FFFDFF',
         black: '#000000',
         white: '#FFFFFF',
-        gray: '#f0f0f0',
+        gray: '#f4f4f5',
       },
     },
   },

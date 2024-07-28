@@ -88,7 +88,6 @@ const Setup = () => {
         </ProgressStep>
         <ProgressStep label="">
           <View style={styles.stepContent}>
-            <View></View>
             <Text style={styles.label}>Password</Text>
             <TextInput
               className="h-12 border border-gray-300 rounded-full mb-4 px-3 w-full bg-white"

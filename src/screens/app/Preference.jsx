@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Switch, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Switch,
+  Alert,
+  StyleSheet,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import RangeSlider from '../../components/RangeSlider';
 import CheckBoxGroup from '../../components/CheckBoxGroup';
@@ -111,14 +118,16 @@ const Preference = ({navigation}) => {
         <View className="flex-row justify-between items-center">
           <TouchableOpacity
             onPress={handleReset}
-            className="px-4 py-3 border border-primary rounded-full w-2/5">
+            className="px-4 py-3 border border-primary rounded-full w-2/5 bg-white"
+            style={styles.cardShadow}>
             <Text className="text-primary text-center text-lg font-medium">
               Reset
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleApply}
-            className="px-4 py-3 bg-primary rounded-full w-2/5">
+            className="px-4 py-3 bg-primary rounded-full w-2/5"
+            style={styles.cardShadow}>
             <Text className="text-white text-center text-lg font-medium">
               Apply
             </Text>
@@ -129,4 +138,13 @@ const Preference = ({navigation}) => {
   );
 };
 
+const styles = StyleSheet.create({
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+});
 export default Preference;

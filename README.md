@@ -78,16 +78,15 @@ Here are some snapshots of the app screens:
 
 <table>
   <tr>
-	<td><img src="snapshot/Signin.png" alt="Signin" width="200"/></td>
-	<td><img src="snapshot/Register.png" alt="Register" width="200"/></td>
-	<td><img src="snapshot/ForgotPassword.png" alt="Forgot Password" width="200"/></td>
-	<td><img src="snapshot/OtpVerification.png" alt="OTP Verification" width="200"/></td>
+	  <td><img src="snapshot/Signin.png" alt="Signin" width="200"/></td>
+	  <td><img src="snapshot/Register.png" alt="Register" width="200"/></td>
+	  <td><img src="snapshot/ForgotPassword.png" alt="ForgotPassword" width="200"/></td>
+	  <td><img src="snapshot/OtpVerification.png" alt="OtpVerification" width="200"/></td>
   </tr>
   <tr>
 		<td><img src="snapshot/Home.png" alt="Profile" width="200"/></td>
-		 <td><img src="snapshot/Preference.png" alt="Profile" width="200"/></td>
+		<td><img src="snapshot/Preference.png" alt="Profile" width="200"/></td>
     <td><img src="snapshot/Profile.png" alt="Profile" width="200"/></td>
-   <!-- Empty cell for alignment -->
   </tr>
 </table>
 
