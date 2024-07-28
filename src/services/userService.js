@@ -78,5 +78,57 @@ const updateUserProfile = async (userId, newData) => {
     throw error;
   }
 };
+const handleLike = async (currentUserId, likedUserId) => {
+  try {
+    // Store the like in the current user's likes sub-collection
+    await firestore()
+      .collection('users')
+      .doc(currentUserId)
+      .collection('likes')
+      .doc(likedUserId)
+      .set({likedAt: firestore.FieldValue.serverTimestamp()});
 
-export {getUserProfile, updateUserProfile, userSwipeProfiles};
+    // Check if the liked user has already liked the current user
+    const mutualLikeDoc = await firestore()
+      .collection('users')
+      .doc(likedUserId)
+      .collection('likes')
+      .doc(currentUserId)
+      .get();
+
+    if (mutualLikeDoc.exists) {
+      // Mutual like found, create a match for both users
+      await createMatch(currentUserId, likedUserId);
+      console.log('Match created!');
+    } else {
+      console.log('Like stored, no mutual like yet.');
+    }
+  } catch (error) {
+    console.error('Error handling like:', error);
+    throw error;
+  }
+};
+
+const createMatch = async (user1Id, user2Id) => {
+  const matchData = {
+    users: [user1Id, user2Id],
+    matchedAt: firestore.FieldValue.serverTimestamp(),
+  };
+
+  // Create match documents for both users
+  await firestore()
+    .collection('users')
+    .doc(user1Id)
+    .collection('matches')
+    .doc(user2Id)
+    .set(matchData);
+
+  await firestore()
+    .collection('users')
+    .doc(user2Id)
+    .collection('matches')
+    .doc(user1Id)
+    .set(matchData);
+};
+
+export {getUserProfile, updateUserProfile, userSwipeProfiles, handleLike};
