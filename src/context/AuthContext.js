@@ -9,7 +9,7 @@ import React, {
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import Toast from 'react-native-toast-message';
+import {showToast} from '../utils/Toast';
 
 export const AuthContext = createContext();
 
@@ -30,18 +30,6 @@ export const AuthProvider = ({children}) => {
 
     return unsubscribe;
   }, []);
-
-  const showToast = (type, text1, text2) => {
-    Toast.show({
-      type,
-      text1,
-      text2,
-      position: 'top',
-      visibilityTime: 4000,
-      autoHide: true,
-      topOffset: 50,
-    });
-  };
 
   const register = async (name, email, phone, password) => {
     try {
@@ -176,7 +164,6 @@ export const AuthProvider = ({children}) => {
       requestOtp,
       verifyOtpAndSetPassword,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [user],
   );
 

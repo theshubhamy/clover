@@ -146,10 +146,10 @@ const SwiperCard = ({
                     className="absolute bottom-0 bg-whitegray w-full h-20 flex-row justify-between items-center px-6 py-2 rounded-b-xl"
                     style={styles.cardShadow}>
                     <View>
-                      <Text className="text-xl font-bold">{card.name}</Text>
-                      <Text>{card.phone}</Text>
+                      <Text className="text-xl font-bold">{card?.name}</Text>
+                      <Text>{card?.phone}</Text>
                     </View>
-                    <Text>{card.age || '21'}</Text>
+                    <Text>{card?.age}</Text>
                   </View>
                 </View>
               )}
