@@ -5,7 +5,7 @@ import {Icon, MIcon} from '../components/Icons';
 import Profile from './app/Profile';
 import Home from './app/Home';
 import Feed from './app/Feed';
-import Matches from './app/Matches';
+import Likes from './app/Likes';
 import Chat from './app/Chat';
 const {Navigator, Screen} = createBottomTabNavigator();
 
@@ -33,8 +33,8 @@ const MyTabs = () => {
         }}
       />
       <Screen
-        name="Matches"
-        component={Matches}
+        name="Likes"
+        component={Likes}
         options={{
           tabBarIcon: Icon('heart'),
         }}

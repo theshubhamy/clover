@@ -1,12 +1,12 @@
 import {View, Text} from 'react-native';
 import React from 'react';
 
-const Matches = () => {
+const Match = () => {
   return (
     <View>
-      <Text>Matches</Text>
+      <Text>Match</Text>
     </View>
   );
 };
 
-export default Matches;
+export default Match;

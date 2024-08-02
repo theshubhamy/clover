@@ -5,6 +5,7 @@ import NewChat from '../screens/app/NewChat';
 import ChatRoom from '../screens/app/ChatRoom';
 import Preference from '../screens/app/Preference';
 import Setup from '../screens/app/Setup';
+import Match from '../screens/app/Match';
 const {Navigator, Screen, Group} = createStackNavigator();
 
 const AppStack = () => {
@@ -21,6 +22,9 @@ const AppStack = () => {
       <Group screenOptions={{presentation: 'modal'}}>
         <Screen name="Preference" component={Preference} />
         <Screen name="Setup" component={Setup} />
+      </Group>
+      <Group screenOptions={{presentation: 'transparentModel'}}>
+        <Screen name="Match" component={Match} />
       </Group>
     </Navigator>
   );
