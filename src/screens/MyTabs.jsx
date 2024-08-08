@@ -4,7 +4,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon, MIcon} from '../components/Icons';
 import Profile from './app/Profile';
 import Home from './app/Home';
-import Feed from './app/Feed';
+import Feed from './feeds/Index';
 import Likes from './app/Likes';
 import Chat from './app/Chat';
 const {Navigator, Screen} = createBottomTabNavigator();

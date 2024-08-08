@@ -38,9 +38,10 @@ const Profile = () => {
         }}
         className="w-24 h-24 rounded-full mb-4"
       />
-      <Text className="text-2xl font-bold text-primary mb-8">
+      <Text className="text-2xl font-bold text-primary mb-2">
         {user?.displayName}
       </Text>
+      <Text className="text-lg font-bold mb-8">{user?.email}</Text>
       <View className=" w-full ">
         <FlatList
           data={items}

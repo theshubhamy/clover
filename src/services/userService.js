@@ -61,7 +61,7 @@ const userSwipeProfiles = async (type, userId, userswiped) => {
       .doc(userId)
       .collection(type)
       .doc(userswiped?.id)
-      .set(userswiped);
+      .set(userswiped, {merge: true});
   } catch (error) {
     console.error('Error fetching user profile:', error);
     throw error;
