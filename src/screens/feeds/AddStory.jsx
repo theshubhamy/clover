@@ -236,4 +236,4 @@ const styles = StyleSheet.create({
 
 export default AddStory;
 // re write like first screen  upload or capture image or video.
-// 2nd screen filter , add text on image or video set text  postion, and apply snapchat filter templete
+// 2nd screen filter , add text on image or video set text  postion, and apply snapchat filter.
