@@ -1,12 +1,14 @@
-import {View, Text} from 'react-native';
+import {SafeAreaView} from 'react-native';
 import React from 'react';
 import Stories from './Stories';
-const Feed = () => {
+const Feed = ({navigation}) => {
+  const navigateToAddStory = () => {
+    navigation.navigate('AddStory');
+  };
   return (
-    <View className="flex-1  bg-white">
-      <Text>Feed</Text>
-      <Stories />
-    </View>
+    <SafeAreaView className="flex-1  bg-white">
+      <Stories navigateToAddStory={navigateToAddStory} />
+    </SafeAreaView>
   );
 };
 

@@ -99,3 +99,5 @@ If you encounter issues running the app, refer to the [React Native troubleshoot
 For more details on React Native, visit the [React Native documentation](https://reactnative.dev/docs/getting-started).
 
 Happy coding! 🚀
+
+<!--insta story upload image , on that user can add text, and save photo-->

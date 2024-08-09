@@ -8,3 +8,9 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+-keepclassmembers class ** {
+    @com.facebook.react.bridge.ReactMethod <methods>;
+}
+-keepclassmembers class * extends com.facebook.react.bridge.ReactContextBaseJavaModule {
+    @com.facebook.react.bridge.ReactMethod <methods>;
+}

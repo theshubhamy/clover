@@ -80,9 +80,18 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSLocationWhenInUseUsageDescription</key>
- <string>This app needs access to your location.</string>
- <key>NSLocationAlwaysUsageDescription</key>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to your location.</string>
+<key>NSLocationAlwaysUsageDescription</key>
 <string>We need your location to provide better service.</string>
+<key>NSCameraUsageDescription</key>
+<string>$(PRODUCT_NAME) needs access to your Camera.</string>
+<key>NSPhotoLibraryUsageDescription</key>
+<string>This app needs access to your photo library to save photos.</string>
+<key>NSUserNotificationUsageDescription</key>
+<string>This app needs access to send you notifications.</string>
+<!-- optionally, if you want to record audio: -->
+<key>NSMicrophoneUsageDescription</key>
+<string>$(PRODUCT_NAME) needs access to your Microphone.</string>
 </dict>
 </plist>

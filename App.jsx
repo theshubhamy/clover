@@ -9,14 +9,14 @@ import {LocationProvider} from './src/context/LocationContext';
 import AppStack from './src/navigations/AppStack';
 import AuthStack from './src/navigations/AuthStack';
 import {AuthContext} from './src/context/AuthContext';
-import useLocation from './src/hooks/useLocation';
+import usePermissions from './src/hooks/usePermissions';
 
 const App = () => {
   const {user} = useContext(AuthContext);
   const queryClient = new QueryClient();
 
-  // Use custom hook to manage location
-  useLocation();
+  // Use custom hook to manage Permissions
+  usePermissions();
 
   return (
     <SafeAreaView className="flex-1">
