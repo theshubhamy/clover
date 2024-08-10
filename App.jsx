@@ -14,8 +14,6 @@ import usePermissions from './src/hooks/usePermissions';
 const App = () => {
   const {user} = useContext(AuthContext);
   const queryClient = new QueryClient();
-
-  // Use custom hook to manage Permissions
   usePermissions();
 
   return (
