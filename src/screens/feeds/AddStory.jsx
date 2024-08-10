@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Camera, useCameraDevice} from 'react-native-vision-camera';
 import ImagePicker from 'react-native-image-crop-picker';
 import Video from 'react-native-video';
+
 const AddStory = ({navigation}) => {
   const device = useCameraDevice('front');
   const [torch, setTorch] = useState('off');
@@ -19,6 +20,7 @@ const AddStory = ({navigation}) => {
   const cameraRef = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
   const blinkingAnimation = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     async function getPermission() {
       const permission = await Camera.requestCameraPermission();
@@ -28,6 +30,7 @@ const AddStory = ({navigation}) => {
     }
     getPermission();
   }, []);
+
   useEffect(() => {
     if (isRecording) {
       Animated.loop(
@@ -50,7 +53,6 @@ const AddStory = ({navigation}) => {
     }
   }, [isRecording, blinkingAnimation]);
 
-  // Capture Photo
   const captureImage = async () => {
     if (cameraRef.current) {
       const photo = await cameraRef.current.takePhoto({
@@ -65,7 +67,6 @@ const AddStory = ({navigation}) => {
     }
   };
 
-  // Capture Video
   const captureVideo = async () => {
     if (cameraRef.current) {
       if (isRecording) {
@@ -92,13 +93,11 @@ const AddStory = ({navigation}) => {
     }
   };
 
-  // Select Media from Gallery
   const selectMedia = () => {
     ImagePicker.openPicker({
       mediaType: 'video',
     }).then(response => {
       if (response) {
-        // Check video duration
         const videoUri = response.path;
         const videoPlayer = new Video({uri: videoUri});
 
@@ -142,6 +141,27 @@ const AddStory = ({navigation}) => {
         />
       )}
 
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="close-outline" size={30} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cameraFlashBtn}
+          onPress={() => {
+            setFlashToggle(!flashtoggle);
+            torch === 'off' ? setTorch('on') : setTorch('off');
+          }}>
+          <Icon
+            name={torch === 'off' ? 'flash-off' : 'flash'}
+            size={30}
+            color="#fff"
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => Linking.openSettings()}>
+          <Icon name="settings-outline" size={30} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.bottomBar}>
         <TouchableOpacity onPress={selectMedia}>
           <Icon name="images-outline" size={40} color="#fff" />
@@ -168,18 +188,6 @@ const AddStory = ({navigation}) => {
             )}
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cameraFlashBtn}
-          onPress={() => {
-            setFlashToggle(!flashtoggle);
-            torch === 'off' ? setTorch('on') : setTorch('off');
-          }}>
-          <Icon
-            name={torch === 'off' ? 'flash-off' : 'flash'}
-            size={40}
-            color="#fff"
-          />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -195,6 +203,20 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
     width: '100%',
+  },
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+  },
+  title: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   bottomBar: {
     flexDirection: 'row',
