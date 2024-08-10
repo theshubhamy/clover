@@ -6,12 +6,10 @@ import {
   Text,
   Linking,
   Animated,
-  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Camera, useCameraDevice} from 'react-native-vision-camera';
 import ImagePicker from 'react-native-image-crop-picker';
-import Video from 'react-native-video';
 
 const AddStory = ({navigation}) => {
   const device = useCameraDevice('front');
@@ -95,26 +93,13 @@ const AddStory = ({navigation}) => {
 
   const selectMedia = () => {
     ImagePicker.openPicker({
-      mediaType: 'video',
+      mediaType: 'any',
     }).then(response => {
       if (response) {
-        const videoUri = response.path;
-        const videoPlayer = new Video({uri: videoUri});
-
-        videoPlayer.onLoad = ({duration}) => {
-          if (duration <= 30) {
-            navigation.navigate('StoryCanvas', {
-              mediaUri: videoUri,
-              mediaType: 'video',
-            });
-          } else {
-            Alert.alert(
-              'Video Too Long',
-              'Please select a video that is 30 seconds or less.',
-              [{text: 'OK', onPress: () => {}}],
-            );
-          }
-        };
+        navigation.navigate('StoryCanvas', {
+          mediaUri: response.path,
+          mediaType: response.mime.includes('video') ? 'video' : 'photo',
+        });
       }
     });
   };
