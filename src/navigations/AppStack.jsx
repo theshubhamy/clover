@@ -7,6 +7,7 @@ import Preference from '../screens/app/Preference';
 import Setup from '../screens/app/Setup';
 import Match from '../screens/app/Match';
 import AddStory from '../screens/feeds/AddStory';
+import StoryCanvas from '../screens/feeds/StoryCanvas';
 const {Navigator, Screen, Group} = createStackNavigator();
 
 const AppStack = () => {
@@ -25,6 +26,7 @@ const AppStack = () => {
         <Screen name="NewChat" component={NewChat} />
         <Screen name="ChatRoom" component={ChatRoom} />
         <Screen name="AddStory" component={AddStory} />
+        <Screen name="StoryCanvas" component={StoryCanvas} />
       </Group>
       <Group
         screenOptions={({navigation}) => ({
