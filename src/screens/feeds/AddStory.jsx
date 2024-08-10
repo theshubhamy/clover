@@ -1,29 +1,65 @@
-import React, {useRef, useState} from 'react';
-import {View, TouchableOpacity, SafeAreaView, StyleSheet} from 'react-native';
+import React, {useRef, useState, useEffect} from 'react';
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  Linking,
+  Animated,
+  Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {Camera, useCameraDevices} from 'react-native-vision-camera';
+import {Camera, useCameraDevice} from 'react-native-vision-camera';
 import ImagePicker from 'react-native-image-crop-picker';
-
+import Video from 'react-native-video';
 const AddStory = ({navigation}) => {
-  const devices = useCameraDevices();
-  const [cameraPosition, setCameraPosition] = useState('back');
-  const device = cameraPosition === 'back' ? devices.back : devices.front;
+  const device = useCameraDevice('front');
+  const [torch, setTorch] = useState('off');
+  const [flashtoggle, setFlashToggle] = useState(false);
   const cameraRef = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
-
-  // Switch Camera
-  const switchCamera = () => {
-    setCameraPosition(prevPosition =>
-      prevPosition === 'back' ? 'front' : 'back',
-    );
-  };
+  const blinkingAnimation = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    async function getPermission() {
+      const permission = await Camera.requestCameraPermission();
+      if (permission === 'denied') {
+        await Linking.openSettings();
+      }
+    }
+    getPermission();
+  }, []);
+  useEffect(() => {
+    if (isRecording) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(blinkingAnimation, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blinkingAnimation, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      blinkingAnimation.stopAnimation();
+      blinkingAnimation.setValue(0);
+    }
+  }, [isRecording, blinkingAnimation]);
 
   // Capture Photo
   const captureImage = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePhoto();
-      navigation.navigate('EditMediaScreen', {
-        mediaUri: photo.uri,
+      const photo = await cameraRef.current.takePhoto({
+        qualityPrioritization: 'quality',
+        flash: `${torch}`,
+        enableAutoRedEyeReduction: true,
+      });
+      navigation.navigate('StoryCanvas', {
+        mediaUri: photo.path,
         mediaType: 'photo',
       });
     }
@@ -36,20 +72,22 @@ const AddStory = ({navigation}) => {
         const video = await cameraRef.current.stopRecording();
         setIsRecording(false);
         navigation.navigate('StoryCanvas', {
-          mediaUri: video.uri,
+          mediaUri: video.path,
           mediaType: 'video',
         });
       } else {
+        setIsRecording(true);
+        const torchEnabled = device?.hasTorch && torch === 'on';
         cameraRef.current.startRecording({
+          flash: torchEnabled ? 'on' : 'off',
           onRecordingFinished: video => {
             navigation.navigate('StoryCanvas', {
-              mediaUri: video.uri,
+              mediaUri: video.path,
               mediaType: 'video',
             });
           },
-          onRecordingError: error => console.error(error),
+          onRecordingError: error => console.error(error + '89'),
         });
-        setIsRecording(true);
       }
     }
   };
@@ -57,27 +95,50 @@ const AddStory = ({navigation}) => {
   // Select Media from Gallery
   const selectMedia = () => {
     ImagePicker.openPicker({
-      mediaType: 'any',
+      mediaType: 'video',
     }).then(response => {
       if (response) {
-        navigation.navigate('StoryCanvas', {
-          mediaUri: response.path,
-          mediaType: response.mime.includes('video') ? 'video' : 'photo',
-        });
+        // Check video duration
+        const videoUri = response.path;
+        const videoPlayer = new Video({uri: videoUri});
+
+        videoPlayer.onLoad = ({duration}) => {
+          if (duration <= 30) {
+            navigation.navigate('StoryCanvas', {
+              mediaUri: videoUri,
+              mediaType: 'video',
+            });
+          } else {
+            Alert.alert(
+              'Video Too Long',
+              'Please select a video that is 30 seconds or less.',
+              [{text: 'OK', onPress: () => {}}],
+            );
+          }
+        };
       }
     });
   };
 
+  if (!device) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading camera...</Text>
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {device && (
         <Camera
           ref={cameraRef}
-          style={styles.camera}
+          style={StyleSheet.absoluteFill}
           device={device}
           isActive={true}
           photo={true}
           video={true}
+          audio={true}
         />
       )}
 
@@ -89,13 +150,38 @@ const AddStory = ({navigation}) => {
           <Icon name="camera-outline" size={40} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity onPress={captureVideo}>
-          <Icon name="videocam-outline" size={40} color="#fff" />
+          <View style={styles.recordingIconContainer}>
+            <Icon
+              name={isRecording ? 'videocam-outline' : 'videocam-off'}
+              size={40}
+              color="#fff"
+            />
+            {isRecording && (
+              <Animated.View
+                style={[
+                  styles.blinkingDot,
+                  {
+                    opacity: blinkingAnimation,
+                  },
+                ]}
+              />
+            )}
+          </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={switchCamera}>
-          <Icon name="camera-reverse-outline" size={40} color="#fff" />
+        <TouchableOpacity
+          style={styles.cameraFlashBtn}
+          onPress={() => {
+            setFlashToggle(!flashtoggle);
+            torch === 'off' ? setTorch('on') : setTorch('off');
+          }}>
+          <Icon
+            name={torch === 'off' ? 'flash-off' : 'flash'}
+            size={40}
+            color="#fff"
+          />
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -103,19 +189,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   camera: {
     flex: 1,
+    width: '100%',
   },
   bottomBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: '#000',
     position: 'absolute',
     bottom: 0,
     width: '100%',
+  },
+  recordingIconContainer: {
+    position: 'relative',
+  },
+  blinkingDot: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
   },
 });
 

@@ -13,6 +13,7 @@ import {ImageFilterKit} from 'react-native-image-filter-kit';
 import RNFS from 'react-native-fs';
 
 const StoryCanvas = ({route, navigation}) => {
+  const timestamp = new Date().toISOString();
   const {mediaUri, mediaType} = route.params;
   const [filteredMediaUri, setFilteredMediaUri] = useState(mediaUri);
   const [textOverlay, setTextOverlay] = useState('');
@@ -32,7 +33,7 @@ const StoryCanvas = ({route, navigation}) => {
   // Save Image Locally or Upload to Server
   const saveMedia = async () => {
     if (filteredMediaUri) {
-      const filePath = `${RNFS.DocumentDirectoryPath}/filteredMedia.jpg`;
+      const filePath = `${RNFS.DocumentDirectoryPath}/filteredMedia_${timestamp}.jpg`;
       await RNFS.copyFile(filteredMediaUri, filePath);
       console.log('Image saved locally:', filePath);
     }
