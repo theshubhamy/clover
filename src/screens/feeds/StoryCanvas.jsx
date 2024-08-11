@@ -1,62 +1,49 @@
-import {BlurView} from '@react-native-community/blur';
-import React, {useEffect, useRef, useState, useMemo} from 'react';
+import React, {useState, useRef, useMemo, useEffect} from 'react';
 import {
-  Animated,
-  Image,
+  View,
+  TouchableOpacity,
   ImageBackground,
-  KeyboardAvoidingView,
-  ScrollView,
-  Keyboard,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
+  ScrollView,
+  Animated,
   Dimensions,
+  Platform,
+  KeyboardAvoidingView,
   StatusBar,
 } from 'react-native';
 import {
   PanGestureHandler,
   PinchGestureHandler,
-  RotationGestureHandler,
   State,
   TextInput,
 } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import Video from 'react-native-video';
 import {useKeyboardStatus} from '../../hooks/useKeyboardStatus';
-import {emojiList} from '../../_mock/emojiList';
+import RNFS from 'react-native-fs';
+// import {emojiList} from '../../_mock/emojiList';
 import {textColors} from '../../_mock/textColors';
-
+let {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
+let STATUS_BAR_HEIGHT = StatusBar.currentHeight || 0;
 const StoryCanvas = ({route, navigation}) => {
-  const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-  const STATUS_BAR_HEIGHT = StatusBar.currentHeight || 0;
-  const {mediaUri, mediaType} = route.params;
-  let images = mediaUri;
+  const _animRatioTrashCan = React.useMemo(() => new Animated.Value(1), []);
   const keyboard = useKeyboardStatus();
-  const [states, setState] = useState({});
-  const [currentImageIndex, setCurrentIndex] = useState(0);
-  const [text, setText] = useState('');
+  const timestamp = new Date().toISOString();
+  const {mediaUri, mediaType} = route.params;
   const [draggingLabel, setDraggingLabel] = useState(false);
-  const [showLabelOptions, setShowLabelOptions] = useState(false);
+  const [text, setText] = useState('');
   const [textColor, setTextColor] = useState('#fff');
   const [textAlign, setTextAlign] = useState('center');
   const [textBg, setTextBg] = useState(false);
-  const _animRatioTrashCan = useMemo(() => new Animated.Value(1), []);
-  const _hScrollRef = useRef(null);
-
-  const [mode, setMode] = useState(1); // 1: general, 2: TextEdit, 3: Mention Label, 4: Hashtag Label
-
+  const [textVisible, setTextVisible] = useState(false);
+  const [textColorVisible, setTextColorVisible] = useState(false);
   const _labeLWrapperYAnim = useMemo(() => new Animated.Value(0), []);
-  console.log(images);
-
-  const [enableGesture, setEnableGesture] = useState(true);
   const ref = useRef({
-    processImages: {
-      base64: images.base64,
-      extension: images.extension,
-      uri: images.path,
-      width: images.width,
-      height: images.height,
-      ratio: SCREEN_WIDTH / images.width,
+    processMedia: {
+      uri: mediaUri?.path,
+      width: SCREEN_WIDTH,
+      height: SCREEN_HEIGHT,
       translateX: 0,
       translateY: 0,
       rotateDeg: 0,
@@ -72,59 +59,32 @@ const StoryCanvas = ({route, navigation}) => {
   });
 
   useEffect(() => {
-    _hScrollRef.current?.scrollTo({
-      x: SCREEN_WIDTH * currentImageIndex,
-      y: 0,
-      animated: true,
-    });
-  }, [currentImageIndex, SCREEN_WIDTH]);
-
-  useEffect(() => {
-    if (!keyboard) {
-      setMode(1);
+    if (!keyboard.isOpen) {
+      setTextVisible(false);
     }
-  }, [keyboard]);
+  }, [keyboard.isOpen]);
+  const saveMedia = async () => {
+    if (mediaUri) {
+      const fileName = `${mediaType}_${timestamp}.png`;
 
-  const _onEndDrag = ({
-    nativeEvent: {
-      contentOffset: {x},
-    },
-  }) => {
-    const tabIndex = Math.floor(x / SCREEN_WIDTH);
-    const percentOffset = (x - tabIndex * SCREEN_WIDTH) / SCREEN_WIDTH;
-    let nextTabIndex = percentOffset > 0.5 ? tabIndex + 1 : tabIndex;
-    _hScrollRef.current?.scrollTo({
-      x: nextTabIndex * SCREEN_WIDTH,
-      y: 0,
-      animated: true,
-    });
-    setCurrentIndex(nextTabIndex);
-  };
+      // Determine the correct path for the Downloads directory
+      const downloadDir = Platform.select({
+        android: `${RNFS.DownloadDirectoryPath}/${fileName}`,
+        ios: `${RNFS.DocumentDirectoryPath}/${fileName}`, // iOS doesn't have a public Downloads folder; this uses the app's document directory
+      });
 
-  const _onTranslateStateChange = ({
-    nativeEvent: {translationX, translationY, state},
-  }) => {
-    if (state === State.END) {
-      ref.current.processImages[currentImageIndex].translateX += translationX;
-      ref.current.processImages[currentImageIndex].translateY += translationY;
+      try {
+        await RNFS.copyFile(mediaUri.path, downloadDir);
+        console.log('Image saved locally in Downloads:', downloadDir);
+      } catch (error) {
+        console.error('Error saving image:', error);
+      }
     }
   };
-
-  const _onZoomStateChange = ({nativeEvent: {scale, state}}) => {
-    if (state === State.END) {
-      ref.current.processImages[currentImageIndex].ratio *= scale;
-    }
-  };
-
-  const _onRotateStateChange = ({nativeEvent: {rotation, state}}) => {
-    if (state === State.END) {
-      ref.current.processImages[currentImageIndex].rotateDeg += rotation;
-    }
-  };
-
-  const _onText = () => {
-    setMode(2);
+  // text processing
+  const onText = () => {
     refreshTextState();
+    setTextVisible(true);
   };
 
   const refreshTextState = () => {
@@ -134,7 +94,7 @@ const StoryCanvas = ({route, navigation}) => {
     setTextColor('#fff');
   };
 
-  const _onChangeTextAlign = () => {
+  const onChangeTextAlign = () => {
     setTextAlign(
       textAlign === 'center'
         ? 'flex-start'
@@ -143,8 +103,7 @@ const StoryCanvas = ({route, navigation}) => {
         : 'center',
     );
   };
-
-  const _onDoneText = () => {
+  const onDoneText = () => {
     if (text.length > 0) {
       const offsetX =
         textAlign === 'center'
@@ -152,12 +111,10 @@ const StoryCanvas = ({route, navigation}) => {
           : textAlign === 'flex-start'
           ? 15
           : SCREEN_WIDTH - ref.current.textWidth - 15;
-      const textZindexList = ref.current.processImages[
-        currentImageIndex
-      ].texts.map(x => x.zIndex);
-      const labelZindexList = ref.current.processImages[
-        currentImageIndex
-      ].labels.map(x => x.zIndex);
+      const textZindexList = ref.current.processMedia.texts?.map(x => x.zIndex);
+      const labelZindexList = ref.current.processMedia.labels?.map(
+        x => x.zIndex,
+      );
       let maxlabelZindex = Math.max(...textZindexList.concat(labelZindexList));
       maxlabelZindex = maxlabelZindex !== -Infinity ? maxlabelZindex : 0;
       const storyText = {
@@ -176,11 +133,27 @@ const StoryCanvas = ({route, navigation}) => {
         ratio: 1,
         animRatio: new Animated.Value(1),
       };
-      ref.current.processImages[currentImageIndex].texts.push(storyText);
+      ref.current.processMedia.texts.push(storyText);
+      setTextVisible(false);
     }
-    setMode(1);
   };
-
+  const onLabelOptionsContainerTranslateStateChange = ({
+    nativeEvent: {translationY, state},
+  }) => {
+    if (state === State.END) {
+      ref.current.labelContainerY += translationY;
+    }
+  };
+  const onLabelOptionsContainerTranslate = ({nativeEvent: {translationY}}) => {
+    if (
+      ref.current.labelContainerY + translationY <
+        -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50) ||
+      ref.current.labelContainerY + translationY > 0
+    ) {
+      return;
+    }
+    _labeLWrapperYAnim.setValue(ref.current.labelContainerY + translationY);
+  };
   const _onTextLabelTranslateHandler = (
     index,
     {nativeEvent: {translationX, translationY}},
@@ -188,7 +161,7 @@ const StoryCanvas = ({route, navigation}) => {
     if (!draggingLabel) {
       setDraggingLabel(true);
     }
-    const label = ref.current.processImages[currentImageIndex].texts[index];
+    const label = ref.current.processMedia.texts[index];
 
     if (
       Math.abs(
@@ -220,7 +193,7 @@ const StoryCanvas = ({route, navigation}) => {
   ) => {
     setDraggingLabel(false);
     if (state === State.END) {
-      const label = ref.current.processImages[currentImageIndex].texts[index];
+      const label = ref.current.processMedia.texts[index];
       label.x += translationX;
       label.y += translationY;
       if (
@@ -228,15 +201,15 @@ const StoryCanvas = ({route, navigation}) => {
           (label.y + label.height) * label.ratio - ref.current.trashCanY,
         ) < 50
       ) {
-        ref.current.processImages[currentImageIndex].texts.splice(index, 1);
-        setState({});
+        ref.current.processMedia.texts.splice(index, 1);
       }
       ref.current.zoomTrashCan = false;
     }
   };
 
+  // Label zoom processor
   const _onTextLabelZoomHandler = (index, {nativeEvent: {scale}}) => {
-    const label = ref.current.processImages[currentImageIndex].texts[index];
+    const label = ref.current.processMedia.texts[index];
     label.animRatio.setValue(label.ratio * scale);
   };
 
@@ -245,313 +218,45 @@ const StoryCanvas = ({route, navigation}) => {
     {nativeEvent: {scale, state}},
   ) => {
     if (state === State.END) {
-      const label = ref.current.processImages[currentImageIndex].texts[index];
+      const label = ref.current.processMedia.texts[index];
       label.ratio *= scale;
-    }
-  };
-
-  const _onLabelOptionsContainerTranslate = ({nativeEvent: {translationY}}) => {
-    if (mode !== 1) {
-      return;
-    }
-    if (
-      ref.current.labelContainerY + translationY <
-        -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50) ||
-      ref.current.labelContainerY + translationY > 0
-    ) {
-      return;
-    }
-    _labeLWrapperYAnim.setValue(ref.current.labelContainerY + translationY);
-  };
-
-  const _onLabelOptionsContainerTranslateStateChange = ({
-    nativeEvent: {translationY, state},
-  }) => {
-    if (mode !== 1) {
-      return;
-    }
-    if (state === State.END) {
-      ref.current.labelContainerY += translationY;
-    }
-  };
-
-  const _toggleLabelOptions = () => {
-    if (showLabelOptions) {
-      Animated.timing(_labeLWrapperYAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }).start(() => {
-        setShowLabelOptions(false);
-        ref.current.labelContainerY = 0;
-      });
-    } else {
-      setShowLabelOptions(true);
-      Animated.timing(_labeLWrapperYAnim, {
-        toValue: -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50),
-        duration: 500,
-        useNativeDriver: true,
-      }).start(
-        () =>
-          (ref.current.labelContainerY = -(
-            SCREEN_HEIGHT -
-            STATUS_BAR_HEIGHT -
-            50
-          )),
-      );
-    }
-  };
-  const _onLabelOptionsContainerTranslateChangeState = ({
-    nativeEvent: {translationY, state},
-  }) => {
-    if (state === State.END) {
-      if (
-        ref.current.labelContainerY + translationY <
-        -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50) / 2
-      ) {
-        Animated.timing(_labeLWrapperYAnim, {
-          duration: 250,
-          toValue: -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50),
-          useNativeDriver: true,
-        }).start();
-        ref.current.labelContainerY = -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50);
-      } else {
-        Animated.timing(_labeLWrapperYAnim, {
-          duration: 250,
-          toValue: 0,
-          useNativeDriver: true,
-        }).start(() => setShowLabelOptions(false));
-        ref.current.labelContainerY = 0;
-        Keyboard.dismiss();
-      }
-    }
-  };
-
-  const _showLabelOptionsContainer = () => {
-    setShowLabelOptions(true);
-    Animated.timing(_labeLWrapperYAnim, {
-      duration: 250,
-      toValue: -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50),
-      useNativeDriver: true,
-    }).start();
-    ref.current.labelContainerY = -(SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50);
-  };
-
-  const _hideLabelOptionsContainer = () => {
-    Animated.timing(_labeLWrapperYAnim, {
-      duration: 250,
-      toValue: 0,
-      useNativeDriver: true,
-    }).start(() => setShowLabelOptions(false));
-    ref.current.labelContainerY = 0;
-    Keyboard.dismiss();
-  };
-
-  // Label processor
-  const _onLabelTranslateHandler = (
-    index,
-    {nativeEvent: {translationX, translationY}},
-  ) => {
-    if (!draggingLabel) {
-      setDraggingLabel(true);
-    }
-    const label = ref.current.processImages[currentImageIndex].labels[index];
-
-    if (
-      Math.abs(
-        (label.y + translationY + label.height) * label.ratio -
-          ref.current.trashCanY,
-      ) < 50
-    ) {
-      if (!ref.current.zoomTrashCan) {
-        Animated.spring(_animRatioTrashCan, {
-          toValue: 1.5,
-          useNativeDriver: true,
-        }).start(() => (ref.current.zoomTrashCan = true));
-      }
-    } else {
-      if (ref.current.zoomTrashCan) {
-        Animated.spring(_animRatioTrashCan, {
-          toValue: 1,
-          useNativeDriver: true,
-        }).start(() => (ref.current.zoomTrashCan = false));
-      }
-    }
-    label.animX.setValue((label.x + translationX) * label.ratio);
-    label.animY.setValue((label.y + translationY) * label.ratio);
-  };
-
-  const _onLabelTranslateChangeState = (
-    index,
-    {nativeEvent: {translationX, translationY, state}},
-  ) => {
-    setDraggingLabel(false);
-    if (state === State.END) {
-      const label = ref.current.processImages[currentImageIndex].labels[index];
-      label.x += translationX;
-      label.y += translationY;
-      if (
-        Math.abs(
-          (label.y + label.height) * label.ratio - ref.current.trashCanY,
-        ) < 50
-      ) {
-        ref.current.processImages[currentImageIndex].labels.splice(index, 1);
-        setState({}); // Updated to match the previous change
-      }
-      ref.current.zoomTrashCan = false;
-    }
-  };
-
-  // Label zoom processor
-  const _onLabelZoomHandler = (index, {nativeEvent: {scale}}) => {
-    const label = ref.current.processImages[currentImageIndex].labels[index];
-    label.animRatio.setValue(label.ratio * scale);
-  };
-
-  const _onLabelZoomChangeState = (index, {nativeEvent: {scale, state}}) => {
-    if (state === State.END) {
-      const label = ref.current.processImages[currentImageIndex].labels[index];
-      label.ratio *= scale;
-    }
-  };
-
-  const _onSelectedEmoji = emoji => {
-    const textZindexList = ref.current.processImages[
-      currentImageIndex
-    ].texts.map(x => x.zIndex);
-    const labelZindexList = ref.current.processImages[
-      currentImageIndex
-    ].labels.map(x => x.zIndex);
-    let maxlabelZindex =
-      Math.max(...textZindexList.concat(labelZindexList)) || 0;
-    maxlabelZindex = maxlabelZindex !== -Infinity ? maxlabelZindex : 0;
-    const emojiLabel = {
-      zIndex: maxlabelZindex + 1,
-      animRatio: new Animated.Value(1),
-      animX: new Animated.Value((SCREEN_WIDTH - 55) / 2),
-      animY: new Animated.Value((SCREEN_HEIGHT - 55) / 2),
-      x: (SCREEN_WIDTH - 55) / 2,
-      y: (SCREEN_HEIGHT - 55) / 2,
-      fontSize: 40,
-      height: 55,
-      width: 55,
-      ratio: 1,
-      text: emoji,
-      type: 'emoji',
-    };
-    ref.current.processImages[currentImageIndex].labels.push(emojiLabel);
-    setState({}); // Updated to match the previous change
-  };
-
-  const _onDoneLabel = () => {
-    if (text.length < 2) {
-      return setMode(1);
-    }
-    const textZindexList = ref.current.processImages[
-      currentImageIndex
-    ].texts.map(x => x.zIndex);
-    const labelZindexList = ref.current.processImages[
-      currentImageIndex
-    ].labels.map(x => x.zIndex);
-    let maxlabelZindex =
-      Math.max(...textZindexList.concat(labelZindexList)) || 0;
-    maxlabelZindex = maxlabelZindex !== -Infinity ? maxlabelZindex : 0;
-    const label = {
-      zIndex: maxlabelZindex + 1,
-      animRatio: new Animated.Value(1),
-      animX: new Animated.Value(
-        (SCREEN_WIDTH - (ref.current.textWidth + 10)) / 2,
-      ),
-      animY: new Animated.Value((SCREEN_HEIGHT - 64) / 2),
-      x: (SCREEN_WIDTH - (ref.current.textWidth + 10)) / 2,
-      y: (SCREEN_HEIGHT - 64) / 2,
-      fontSize: 40,
-      height: 64,
-      width: ref.current.textWidth + 10,
-      ratio: 1,
-      text,
-      type: 'people',
-    };
-    if (mode === 4) {
-      label.type = 'hashtag';
-    }
-    ref.current.processImages[currentImageIndex].labels.push(label);
-    setMode(1);
-  };
-
-  const _onSelectLabel = (type, value) => {
-    switch (type) {
-      case 'address':
-        break;
-      case 'people':
-        refreshTextState();
-        setMode(3);
-        break;
-      case 'hashtag':
-        refreshTextState();
-        setMode(4);
-        break;
-      case 'emoji':
-        _onSelectedEmoji(value);
-        break;
-      default:
-        throw new Error();
-    }
-    _hideLabelOptionsContainer();
-  };
-
-  const _validateLabelText = txt => {
-    if (txt[0]) {
-      if (mode === 3 && txt[0] !== '@') {
-        return setText('@' + txt);
-      }
-      if (mode === 4 && txt[0] !== '#') {
-        return setText('#' + txt);
-      }
-    }
-    if (mode === 3 && /^((\@(\w|\.)+)|\@)$/g.test(txt)) {
-      setText(txt);
-    }
-    if (mode === 4 && /^((\#\w+)|\#)$/g.test(txt)) {
-      setText(txt);
     }
   };
 
   return (
     <PanGestureHandler
-      onHandlerStateChange={_onLabelOptionsContainerTranslateChangeState}
-      onGestureEvent={_onLabelOptionsContainerTranslate}>
+      onHandlerStateChange={onLabelOptionsContainerTranslateStateChange}
+      onGestureEvent={onLabelOptionsContainerTranslate}>
       <View>
-        {mode === 1 && !draggingLabel && !showLabelOptions && (
+        {!draggingLabel && !textVisible && (
           <View style={styles.topOptionsWrapper}>
             <TouchableOpacity
               onPress={navigation.goBack}
               style={styles.btnTopOption}>
-              <Text
-                style={{
-                  fontSize: 30,
-                  color: '#fff',
-                }}>
-                ✕
-              </Text>
+              <Icon name="chevron-left" size={40} color="#fff" />
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={_showLabelOptionsContainer}
-              style={styles.btnTopOption}>
-              <Icon name="sticker-emoji" size={30} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={_onText} style={styles.btnTopOption}>
+
+            <TouchableOpacity onPress={onText} style={styles.btnTopOption}>
               <Icon name="alpha-a-box" size={30} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={saveMedia} style={styles.iconButton}>
+              <Icon name="download" size={30} color="#fff" />
             </TouchableOpacity>
           </View>
         )}
-        {mode === 2 && (
+        {/* text canvas */}
+        {textVisible && (
           <KeyboardAvoidingView
             behavior="height"
             style={styles.textToolWrapper}>
             <View style={styles.textTopOptions}>
               <TouchableOpacity
-                onPress={_onChangeTextAlign}
+                onPress={() => setTextVisible(false)}
+                style={styles.btnTopOption}>
+                <Icon name="close" size={30} color="#fff" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onChangeTextAlign}
                 style={styles.btnTopOption}>
                 <Icon
                   name={
@@ -565,26 +270,41 @@ const StoryCanvas = ({route, navigation}) => {
                   color="#fff"
                 />
               </TouchableOpacity>
+
               <TouchableOpacity
-                onPress={setTextBg.bind(null, !textBg)}
+                onPress={() => setTextColorVisible(!textColorVisible)}
                 style={styles.btnTopOption}>
                 <Icon
-                  name={textBg ? 'alpha-a-box' : 'alpha-a'}
+                  name={
+                    textColorVisible ? 'invert-colors' : 'invert-colors-off'
+                  }
                   size={30}
                   color="#fff"
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={_onDoneText}
+                onPress={setTextBg.bind(null, !textBg)}
+                style={styles.btnTopOption}>
+                <Icon
+                  name={textBg ? 'alpha-a-box' : 'alpha-a-box-outline'}
+                  size={30}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={onDoneText}
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   ...styles.btnTopOption,
                   width: 60,
+                  marginEnd: 10,
                 }}>
                 <Text
+                  // eslint-disable-next-line react-native/no-inline-styles
                   style={{
                     fontWeight: 'bold',
                     color: '#fff',
-                    fontSize: 18,
+                    fontSize: 20,
                   }}>
                   Done
                 </Text>
@@ -596,11 +316,13 @@ const StoryCanvas = ({route, navigation}) => {
                 justifyContent: textAlign,
               }}>
               <TouchableOpacity
+                // eslint-disable-next-line react-native/no-inline-styles
                 style={{
                   backgroundColor:
                     textBg === true ? textColor : 'rgba(0,0,0,0)',
                   padding: 5,
                   borderRadius: 5,
+                  bottom: textColorVisible ? 0 : keyboard.keyboardHeight / 2,
                 }}>
                 <TextInput
                   onContentSizeChange={e => {
@@ -612,6 +334,7 @@ const StoryCanvas = ({route, navigation}) => {
                   autoCapitalize="none"
                   value={text}
                   onChangeText={setText}
+                  // eslint-disable-next-line react-native/no-inline-styles
                   style={{
                     textAlign:
                       textAlign === 'flex-start'
@@ -627,128 +350,54 @@ const StoryCanvas = ({route, navigation}) => {
                 />
               </TouchableOpacity>
             </View>
-            <View style={styles.textBottompOptions}>
-              <View
-                style={{
-                  ...styles.circleSelectedColor,
-                  backgroundColor: textColor,
-                }}>
-                <Icon
-                  name="eyedropper-variant"
-                  size={20}
-                  color={textColor === '#fff' ? '#000' : '#fff'}
-                />
-              </View>
-              <ScrollView
-                showsHorizontalScrollIndicator={false}
-                style={{
-                  width: SCREEN_WIDTH - 50,
-                }}
-                keyboardShouldPersistTaps="always"
-                horizontal={true}>
-                {textColors.map((tColor, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => setTextColor(tColor)}
-                    style={{
-                      ...styles.circleTextColor,
-                      backgroundColor: tColor,
-                    }}></TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </KeyboardAvoidingView>
-        )}
-        {(mode === 3 || mode === 4) && (
-          <KeyboardAvoidingView
-            behavior="height"
-            style={{
-              ...styles.textToolWrapper,
-            }}>
-            <View
-              style={{
-                ...styles.textTopOptions,
-                justifyContent: 'flex-end',
-              }}>
-              <TouchableOpacity
-                onPress={_onDoneLabel}
-                style={{
-                  ...styles.btnTopOption,
-                  width: 60,
-                }}>
-                <Text
-                  style={{
-                    fontWeight: 'bold',
-                    color: '#fff',
-                    fontSize: 18,
-                  }}>
-                  Done
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                ...styles.textWrapper,
-                justifyContent: 'center',
-              }}>
-              <View
-                style={{
-                  backgroundColor: '#fff',
-                  borderRadius: 5,
-                  padding: 5,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 64,
-                }}>
-                <TextInput
-                  onSubmitEditing={_onDoneLabel}
-                  onContentSizeChange={e => {
-                    ref.current.textHeight = e.nativeEvent.contentSize.height;
-                    ref.current.textWidth = e.nativeEvent.contentSize.width;
-                  }}
-                  autoFocus={true}
-                  autoCapitalize="none"
-                  value={text}
-                  onChangeText={txt => {
-                    _validateLabelText(txt);
-                  }}
-                  style={{
-                    opacity: 0,
-                    fontSize: 40,
-                    fontWeight: '800',
-                    maxWidth: SCREEN_WIDTH - 30,
-                  }}
-                />
+            {textColorVisible && (
+              <View style={styles.textBottompOptions}>
                 <View
+                  // eslint-disable-next-line react-native/no-inline-styles
                   style={{
-                    position: 'absolute',
-                    left: 5,
-                    top: 5,
-                    width: '100%',
-                    height: '100%',
-                    zIndex: -1,
-                    alignItems: 'center',
+                    ...styles.circleSelectedColor,
+                    backgroundColor: textColor,
+                    bottom: 50,
                   }}>
-                  <Text
-                    text={text}
-                    style={{
-                      fontSize: 40,
-                      opacity: text.length === 0 ? 0.5 : 1,
-                    }}
+                  <Icon
+                    name="eyedropper-variant"
+                    size={20}
+                    color={textColor === '#fff' ? '#000' : '#fff'}
                   />
                 </View>
+                <ScrollView
+                  showsHorizontalScrollIndicator={false}
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  style={{
+                    width: SCREEN_WIDTH,
+                    bottom: 50,
+                  }}
+                  // eslint-disable-next-line react-native/no-inline-styles
+                  contentContainerStyle={{flexDirection: 'row'}}
+                  keyboardShouldPersistTaps="always"
+                  horizontal={true}>
+                  {textColors.map((tColor, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => setTextColor(tColor)}
+                      style={{
+                        ...styles.circleTextColor,
+                        backgroundColor: tColor,
+                      }}
+                    />
+                  ))}
+                </ScrollView>
               </View>
-            </View>
-            <View />
+            )}
           </KeyboardAvoidingView>
         )}
         <ImageBackground
           style={styles.backgroundContainer}
           source={{
-            uri: ref.current.processImages.uri,
+            uri: ref.current.processMedia?.uri,
           }}
-          blurRadius={10}>
-          {ref.current.processImages.texts.map((txtLabel, labelIndex) => (
+          blurRadius={0}>
+          {ref.current.processMedia?.texts?.map((txtLabel, labelIndex) => (
             <PanGestureHandler
               key={labelIndex}
               onGestureEvent={e => {
@@ -765,6 +414,7 @@ const StoryCanvas = ({route, navigation}) => {
                   _onTextLabelZoomChangeState(labelIndex, e);
                 }}>
                 <Animated.View
+                  // eslint-disable-next-line react-native/no-inline-styles
                   style={{
                     zIndex: txtLabel.zIndex,
                     backgroundColor: txtLabel.textBg
@@ -788,6 +438,7 @@ const StoryCanvas = ({route, navigation}) => {
                     ],
                   }}>
                   <Text
+                    // eslint-disable-next-line react-native/no-inline-styles
                     style={{
                       width: txtLabel.width,
                       height: txtLabel.height + 5,
@@ -807,86 +458,51 @@ const StoryCanvas = ({route, navigation}) => {
               </PinchGestureHandler>
             </PanGestureHandler>
           ))}
-          {ref.current.processImages.labels.map((label, labelIndex) => (
-            <PanGestureHandler
-              key={labelIndex}
-              onGestureEvent={e => {
-                _onLabelTranslateHandler(labelIndex, e);
-              }}
-              onHandlerStateChange={e => {
-                _onLabelTranslateChangeState(labelIndex, e);
+          {draggingLabel && (
+            <View
+              // eslint-disable-next-line react-native/no-inline-styles
+              style={{
+                // position: 'absolute', // Use absolute positioning
+                bottom: 200, // Distance from the bottom of the screen
+                left: 0,
+                right: 0,
+                top: 100,
+                zIndex: 100,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 80,
+                backgroundColor: 'rgba(0,0,0,0)',
               }}>
-              <PinchGestureHandler
-                onGestureEvent={e => {
-                  _onLabelZoomHandler(labelIndex, e);
-                }}
-                onHandlerStateChange={e => {
-                  _onLabelZoomChangeState(labelIndex, e);
+              <Animated.View
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  height: 44,
+                  width: 44,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 44,
+                  borderColor: '#fff',
+                  borderWidth: 1,
+                  transform: [
+                    {
+                      scale: _animRatioTrashCan,
+                    },
+                  ],
                 }}>
-                <Animated.View
-                  style={{
-                    zIndex: label.zIndex,
-                    backgroundColor:
-                      label.type === 'emoji' ? 'rgba(0,0,0,0)' : '#fff',
-                    borderRadius: 5,
-                    position: 'absolute',
-                    width: label.width,
-                    height: label.height,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    top: 0,
-                    left: 0,
-                    transform: [
-                      {
-                        translateX: label.animX,
-                      },
-                      {
-                        translateY: label.animY,
-                      },
-                      {
-                        scale: label.animRatio,
-                      },
-                    ],
-                  }}>
-                  {label.type === 'emoji' ? (
-                    <Text style={{fontSize: 60}}>{label.text}</Text>
-                  ) : label.type === 'gif' ? (
-                    <FastImage
-                      source={{
-                        uri: label.uri,
-                      }}
-                      resizeMode={FastImage.resizeMode.cover}
-                      style={{
-                        width: label.width,
-                        height: label.height,
-                      }}
-                    />
-                  ) : (
-                    <FastImage
-                      source={{
-                        uri: label.uri,
-                      }}
-                      resizeMode={FastImage.resizeMode.cover}
-                      style={{
-                        width: label.width,
-                        height: label.height,
-                      }}
-                    />
-                  )}
-                </Animated.View>
-              </PinchGestureHandler>
-            </PanGestureHandler>
-          ))}
+                <Icon name="trash-can-outline" size={30} color="#fff" />
+              </Animated.View>
+            </View>
+          )}
         </ImageBackground>
       </View>
     </PanGestureHandler>
   );
 };
-const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
-const STATUS_BAR_HEIGHT = StatusBar.currentHeight || 0;
+
 const styles = StyleSheet.create({
   backgroundContainer: {
-    overflow: 'hidden',
+    flex: 1,
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT,
     justifyContent: 'center',
@@ -905,26 +521,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    backgroundColor: 'rgba(0,0,0,0.8)',
     zIndex: 1,
     width: '100%',
+    paddingHorizontal: 10,
   },
-  bottomOptionsWrapper: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    height: 100,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 15,
-  },
-  bottomOption: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 50,
-  },
+
   textToolWrapper: {
     position: 'absolute',
     zIndex: 1,
@@ -940,7 +541,8 @@ const styles = StyleSheet.create({
     height: 50 + STATUS_BAR_HEIGHT,
     paddingTop: STATUS_BAR_HEIGHT,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
+    gap: 8,
   },
   textWrapper: {
     paddingHorizontal: 15,
@@ -962,113 +564,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   circleTextColor: {
-    height: 24,
-    width: 24,
-    borderRadius: 24,
-    borderColor: '#fff',
-    borderWidth: 2,
+    width: 36,
     marginHorizontal: 5,
+    height: 36,
+    borderRadius: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnTopOption: {
     width: 44,
     height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  selectedImageWrapper: {
-    paddingHorizontal: 5,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    width: '100%',
-    height: 100,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    zIndex: 10,
-  },
-  previewImageWrapper: {
-    marginHorizontal: 5,
-    borderRadius: 5,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 54,
-    width: 32,
-  },
-  previewMultiImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-    borderRadius: 5,
-  },
-  btnNext: {
-    marginRight: 10,
-    width: 80,
-    height: 44,
-    backgroundColor: '#fff',
-    borderRadius: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  labelOptionsWrapper: {
-    width: '100%',
-    height: SCREEN_HEIGHT - STATUS_BAR_HEIGHT - 50,
-    position: 'absolute',
-    top: '100%',
-    borderTopRightRadius: 10,
-    borderTopLeftRadius: 10,
-    overflow: 'hidden',
-    left: 0,
-  },
-  labelOptionsTitleWrapper: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dragBar: {
-    marginTop: 15,
-    width: 50,
-    height: 3,
-    borderRadius: 1,
-    backgroundColor: '#fff',
-  },
-  labelOptionsSearchWrapper: {
-    height: 44,
-    flexDirection: 'row',
-    width: SCREEN_WIDTH - 30,
-    marginHorizontal: 15,
-    borderBottomColor: '#fff',
-    borderBottomWidth: 1,
-    alignItems: 'center',
-  },
-  labelOptionsSearch: {
-    fontSize: 16,
-    color: '#fff',
-    width: SCREEN_WIDTH - 30 - 44,
-  },
-  searchIcon: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  labelItemWrapper: {
-    width: SCREEN_WIDTH / 3,
-    height: SCREEN_WIDTH / 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mainLabel: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    height: 36,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
   },
 });
 export default StoryCanvas;

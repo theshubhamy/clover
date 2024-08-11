@@ -71,7 +71,7 @@ const AddStory = ({navigation}) => {
         const video = await cameraRef.current.stopRecording();
         setIsRecording(false);
         navigation.navigate('StoryCanvas', {
-          mediaUri: video.path,
+          mediaUri: video,
           mediaType: 'video',
         });
       } else {
@@ -81,7 +81,7 @@ const AddStory = ({navigation}) => {
           flash: torchEnabled ? 'on' : 'off',
           onRecordingFinished: video => {
             navigation.navigate('StoryCanvas', {
-              mediaUri: video.path,
+              mediaUri: video,
               mediaType: 'video',
             });
           },
@@ -97,7 +97,7 @@ const AddStory = ({navigation}) => {
     }).then(response => {
       if (response) {
         navigation.navigate('StoryCanvas', {
-          mediaUri: response.path,
+          mediaUri: response,
           mediaType: response.mime.includes('video') ? 'video' : 'photo',
         });
       }
