@@ -59,7 +59,7 @@ const AddStory = ({navigation}) => {
         enableAutoRedEyeReduction: true,
       });
       navigation.navigate('StoryCanvas', {
-        mediaUri: photo.path,
+        mediaUri: photo,
         mediaType: 'photo',
       });
     }
