@@ -11,8 +11,9 @@ import {useAuth} from '../../context/AuthContext';
 import {fetchUsersWhoLikedMe} from '../../services/matchServices';
 import {useQuery} from '@tanstack/react-query';
 
-const Likes = () => {
+const Likes = ({navigation}) => {
   const {user} = useAuth();
+
   const {data, refetch} = useQuery({
     queryKey: ['usersWhoLikedMe', user?.uid],
     queryFn: () => fetchUsersWhoLikedMe(user?.uid),
@@ -34,6 +35,9 @@ const Likes = () => {
         <Text>{item?.phone}</Text>
         <Text>{item?.age}</Text>
       </View>
+      <TouchableOpacity onPress={() => navigation.navigate('NewChat', item)}>
+        <Text> Chat</Text>
+      </TouchableOpacity>
     </View>
   );
 

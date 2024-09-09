@@ -1,71 +1,128 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
-import {fetchUsers, createNewChatRoom} from '../../services/chatService'; // Import function to fetch matches
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
+import io from 'socket.io-client';
+import axios from 'axios';
+import {useAuth} from '../../context/AuthContext';
+const socket = io('http://localhost:5500'); // Replace with your server URL
 
-const NewChat = ({navigation}) => {
-  const [matches, setMatches] = useState([]);
-  const [selectedMatch, setSelectedMatch] = useState(null);
-  console.log(selectedMatch);
+const NewChat = ({route}) => {
+  const {uid} = route.params;
+  const {user} = useAuth();
+  // Pass room information from navigation params
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
+  const [typing, setTyping] = useState(false);
+
   useEffect(() => {
-    const fetchUserMatches = async () => {
-      try {
-        // Replace with your logic to fetch user matches from Firestore
-        const matchesData = await fetchUsers(); // Implement fetchMatches in FirestoreService.js
-        setMatches(matchesData);
-      } catch (error) {
-        console.error('Error fetching matches:', error);
-      }
-    };
-    fetchUserMatches();
-  }, []);
+    socket.emit('joinRoom', uid);
 
-  const handleCreateChatRoom = async () => {
+    socket.on('sendMessage', newMessage => {
+      setMessages(prevMessages => [...prevMessages, newMessage]);
+    });
+
+    socket.on('typing', data => {
+      setTyping(data.isTyping);
+    });
+
+    return () => {
+      socket.off('sendMessage');
+      socket.off('typing');
+    };
+  }, [uid]);
+
+  const fetchMessages = async (useruid, ruid) => {
     try {
-      if (!selectedMatch) {
-        // Handle case where no match is selected
-        return;
-      }
-      const newChatRoomId = await createNewChatRoom(
-        selectedMatch,
-        selectedMatch.id,
+      const response = await axios.get(
+        `http://localhost:5500/api/chat/getMessages/${useruid}/${ruid}`,
       );
-      console.log(newChatRoomId);
-      navigation.navigate('ChatRoom', {chatRoomId: newChatRoomId});
+      console.log(response.data);
+
+      setMessages(response.data);
     } catch (error) {
-      console.error('Error creating new chat room:', error);
-      // Handle error gracefully, show error message, etc.
+      console.log(error);
+
+      console.error('Error fetching messages:', error);
     }
   };
 
-  const handleMatchSelection = match => {
-    setSelectedMatch(match);
+  useEffect(() => {
+    fetchMessages(user.uid, uid);
+    return () => {};
+  }, [user.uid, uid]);
+
+  const handleSend = () => {
+    if (message.trim()) {
+      // Send the message to the server and store it
+      socket.emit('sendMessage', {
+        room: uid,
+        senderId: user.uid,
+        receiverId: uid,
+        message,
+      });
+      setMessage('');
+    }
+  };
+
+  const handleTyping = () => {
+    socket.emit('typing', {uid, isTyping: true});
+    setTimeout(() => {
+      socket.emit('typing', {uid, isTyping: false});
+    }, 1000);
   };
 
   return (
-    <View className="flex-1">
-      <Text className="text-2xl font-bold p-4">Create New Chat Room</Text>
-      <View className="p-4">
-        <FlatList
-          data={matches}
-          keyExtractor={item => item.userId}
-          renderItem={({item}) => (
-            <TouchableOpacity
-              className="p-4 border-secondary border"
-              onPress={() => handleMatchSelection(item)}>
-              <Text className="text-lg">{item.name}</Text>
-              <Text className="text-lg">{item.phone}</Text>
-            </TouchableOpacity>
-          )}
-        />
-
-        <TouchableOpacity
-          className="p-4 bg-blue-500 rounded-full mt-4"
-          onPress={handleCreateChatRoom}>
-          <Text className="text-white font-bold">Create Chat Room</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={styles.container}>
+      <FlatList
+        data={messages}
+        keyExtractor={item => item._id}
+        renderItem={({item}) => (
+          <View style={styles.message}>
+            <Text>
+              {item.sender}: {item.content}
+            </Text>
+          </View>
+        )}
+        style={styles.messageList}
+      />
+      {typing && <Text>Someone is typing...</Text>}
+      <TextInput
+        style={styles.input}
+        value={message}
+        onChangeText={text => {
+          setMessage(text);
+          handleTyping();
+        }}
+        onSubmitEditing={handleSend}
+      />
+      <Button title="Send" onPress={handleSend} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  messageList: {
+    flex: 1,
+  },
+  message: {
+    marginVertical: 5,
+  },
+  input: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    marginVertical: 5,
+  },
+});
 
 export default NewChat;

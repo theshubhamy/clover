@@ -1,5 +1,6 @@
 import React from 'react';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+
 import MyTabs from '../screens/MyTabs';
 import NewChat from '../screens/app/NewChat';
 import ChatRoom from '../screens/app/ChatRoom';
@@ -27,6 +28,7 @@ const AppStack = () => {
         <Screen name="ChatRoom" component={ChatRoom} />
         <Screen name="AddStory" component={AddStory} />
         <Screen name="StoryCanvas" component={StoryCanvas} />
+        <Screen name="Setup" component={Setup} />
       </Group>
       <Group
         screenOptions={({navigation}) => ({
@@ -34,7 +36,7 @@ const AppStack = () => {
           ...TransitionPresets.ModalSlideFromBottomIOS,
         })}>
         <Screen name="Preference" component={Preference} />
-        <Screen name="Setup" component={Setup} />
+        {/* <Screen name="Setup" component={Setup} /> */}
       </Group>
       <Group
         screenOptions={{
