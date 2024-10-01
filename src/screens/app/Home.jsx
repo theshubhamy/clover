@@ -2,20 +2,18 @@ import React, {useCallback} from 'react';
 import {View, Text, TouchableOpacity, Image} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useQuery} from '@tanstack/react-query';
-// import SwiperCard from '../../components/SwiperCard';
+import SwiperCard from '../../components/SwiperCard';
 import {useAuth} from '../../context/AuthContext';
 import {fetchUsers} from '../../services/userService';
 import {useLocationCtx} from '../../context/LocationContext';
 const Home = ({navigation}) => {
   const {user} = useAuth();
   const {location} = useLocationCtx();
-  console.log(location);
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['users', user?.uid],
     queryFn: () => fetchUsers(user?.uid),
     enabled: !!user?.uid,
   });
-  console.log(data);
 
   const navigateToPreferences = () => {
     navigation.navigate('Preference');
@@ -52,12 +50,12 @@ const Home = ({navigation}) => {
         </View>
         {/* SwiperCard */}
 
-        {/* <SwiperCard
+        <SwiperCard
           data={data}
           navigateToPreferences={navigateToPreferences}
           handleRefresh={handleRefresh}
           isLoading={isLoading}
-        /> */}
+        />
       </View>
     </>
   );
